@@ -1,12 +1,12 @@
-import { Response_Key } from '@/public/DecoratorCustom';
+import { Response_Key } from "@/public/DecoratorCustom";
 import {
   CallHandler,
   ExecutionContext,
   Injectable,
   NestInterceptor,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { map, Observable } from 'rxjs';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { map, Observable } from "rxjs";
 
 // tạo interface cho dữ liệu trả về
 export interface Response<T> {
@@ -34,7 +34,7 @@ export class TransformInterceptor<T>
       map((data) => {
         return {
           statusCode: context.switchToHttp().getResponse().statusCode,
-          message: message || '',
+          message: message || "",
           data,
         };
       }),

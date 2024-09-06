@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -26,7 +26,7 @@ class ReplieCommentProduct {
   @Prop({ type: String, required: true })
   nameUser: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   byUser: mongoose.Schema.Types.ObjectId;
 }
 
@@ -47,7 +47,7 @@ class CommentProduct {
   @Prop({ type: String, required: true })
   content: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   byUser: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: [ReplieCommentProduct], default: [] })

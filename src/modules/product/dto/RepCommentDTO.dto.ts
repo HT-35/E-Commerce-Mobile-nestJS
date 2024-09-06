@@ -1,5 +1,5 @@
-import { IsNotEmpty } from 'class-validator';
-import mongoose from 'mongoose';
+import { IsNotEmpty } from "class-validator";
+import mongoose from "mongoose";
 
 export class ReplyCommentDTO {
   @IsNotEmpty()

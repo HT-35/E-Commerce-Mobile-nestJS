@@ -1,11 +1,11 @@
-import { CreateListTypeProductModelDto } from '@/modules/list-type-product/dto/create-list-type-product-model.dto';
-import { UpdateListTypeProductModelDto } from '@/modules/list-type-product/dto/update-list-type-product-model.dto';
-import { Injectable } from '@nestjs/common';
+import { CreateListTypeProductModelDto } from "@/modules/list-type-product/dto/create-list-type-product-model.dto";
+import { UpdateListTypeProductModelDto } from "@/modules/list-type-product/dto/update-list-type-product-model.dto";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class ListTypeProductModelService {
   create(createListTypeProductModelDto: CreateListTypeProductModelDto) {
-    return 'This action adds a new listTypeProductModel';
+    return "This action adds a new listTypeProductModel";
   }
 
   findAll() {

@@ -1,6 +1,6 @@
-import { CreateListTypeProductModelDto } from '@/modules/list-type-product/dto/create-list-type-product-model.dto';
-import { UpdateListTypeProductModelDto } from '@/modules/list-type-product/dto/update-list-type-product-model.dto';
-import { ListTypeProductModelService } from '@/modules/list-type-product/list-type-product-model.service';
+import { CreateListTypeProductModelDto } from "@/modules/list-type-product/dto/create-list-type-product-model.dto";
+import { UpdateListTypeProductModelDto } from "@/modules/list-type-product/dto/update-list-type-product-model.dto";
+import { ListTypeProductModelService } from "@/modules/list-type-product/list-type-product-model.service";
 import {
   Controller,
   Get,
@@ -9,9 +9,9 @@ import {
   Patch,
   Param,
   Delete,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
-@Controller('list-type-product')
+@Controller("list-type-product")
 export class ListTypeProductModelController {
   constructor(
     private readonly listTypeProductModelService: ListTypeProductModelService,
@@ -29,14 +29,14 @@ export class ListTypeProductModelController {
     return this.listTypeProductModelService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.listTypeProductModelService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateListTypeProductModelDto: UpdateListTypeProductModelDto,
   ) {
     return this.listTypeProductModelService.update(
@@ -45,8 +45,8 @@ export class ListTypeProductModelController {
     );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  remove(@Param("id") id: string) {
     return this.listTypeProductModelService.remove(+id);
   }
 }

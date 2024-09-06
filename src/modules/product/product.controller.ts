@@ -11,11 +11,12 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Request,
 } from '@nestjs/common';
 
 import { CreateProductDto } from '@/modules/product/dto/create-product-model.dto';
 import { UpdateProductModelDto } from '@/modules/product/dto/update-product-model.dto';
-import { ResponseMessage } from '@/public/DecoratorCustom';
+import { ResponseMessage, Roles, Roles_Type } from '@/public/DecoratorCustom';
 import { CommentDTO } from '@/modules/product/dto/CommentDTO.dto';
 import { ReplyCommentDTO } from '@/modules/product/dto/RepCommentDTO.dto';
 import { ProductModelService } from '@/modules/product/product.service';
@@ -36,9 +37,19 @@ export class ProductModelController {
   }
 
   @Post()
+  @Roles(Roles_Type.ADMIN)
   @ResponseMessage('Create Product')
-  create(@Body() CreateProductDto: CreateProductDto) {
-    return this.productModelService.create(CreateProductDto);
+  create(@Body() CreateProductDto: CreateProductDto, @Request() req: any) {
+    console.log('');
+    console.log('');
+    console.log('req', req.user);
+    console.log('');
+    console.log('');
+    console.log('');
+
+    return req.user;
+
+    //return this.productModelService.create(CreateProductDto);
   }
 
   @Patch(':slug')
