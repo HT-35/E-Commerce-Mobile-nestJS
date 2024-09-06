@@ -2,20 +2,20 @@ import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
-} from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { InjectModel } from "@nestjs/mongoose";
-import { User } from "@/modules/user/schema/user.schema";
-import mongoose, { Model } from "mongoose";
+} from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from '@/modules/user/schema/user.schema';
+import mongoose, { Model } from 'mongoose';
 
-import { v4 as uuidv4 } from "uuid";
-import * as dayjs from "dayjs";
-import { hashPassWord } from "@/utils/bcrypt";
-import { MailerService } from "@nestjs-modules/mailer";
-import { ActiveAccount } from "@/auth/dto/activeAccount.dto";
-import { NewPasswordDto } from "@/auth/dto/NewPasswordDto.dto";
-import aqp from "api-query-params";
+import { v4 as uuidv4 } from 'uuid';
+import * as dayjs from 'dayjs';
+import { hashPassWord } from '@/utils/bcrypt';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ActiveAccount } from '@/auth/dto/activeAccount.dto';
+import { NewPasswordDto } from '@/auth/dto/NewPasswordDto.dto';
+import aqp from 'api-query-params';
 
 @Injectable()
 export class UserService {
@@ -29,10 +29,10 @@ export class UserService {
     this.mailerServive.sendMail({
       to: result?.email,
       //from: 'noreply@nestjs.com',
-      subject: "Email test send email with NestJS",
-      text: "welcome", // plaintext body
+      subject: 'Email test send email with NestJS',
+      text: 'welcome', // plaintext body
 
-      template: "./register",
+      template: './register',
       context: {
         name: result?.name ?? result?.email,
         activationCode: IdCode,
@@ -51,14 +51,14 @@ export class UserService {
               codeId: dataClient.codeId,
             },
             {
-              codeId: "",
+              codeId: '',
               isActive: true,
               password: dataClient.password,
               codeExpired: dayjs(),
             },
           );
           return {
-            user: "active successful",
+            user: 'active successful',
           };
         } else {
           // Trường hợp: Kích hoạt tài khoản (Active Account)
@@ -68,22 +68,22 @@ export class UserService {
               codeId: dataClient.codeId,
             },
             {
-              codeId: "",
+              codeId: '',
               isActive: true,
               codeExpired: dayjs(),
             },
           );
           return {
-            user: "active successful",
+            user: 'active successful',
           };
         }
       } else {
         // Nếu code đã hết hạn
-        throw new BadRequestException("CodeId đã hết hạn !!");
+        throw new BadRequestException('CodeId đã hết hạn !!');
       }
     } else {
       // Nếu codeId không đúng
-      throw new BadRequestException("CodeId không đúng !!");
+      throw new BadRequestException('CodeId không đúng !!');
     }
   };
 
@@ -91,14 +91,14 @@ export class UserService {
     const existingUser = await this.findOneByEmail(createUserDto.email);
 
     if (existingUser) {
-      throw new BadRequestException("email đã tồn tại !!");
+      throw new BadRequestException('email đã tồn tại !!');
     }
 
     // Tạo một UUID để làm mã kích hoạt người dùng
     const IdCode = uuidv4();
 
     // Thiết lập thời gian hết hạn của mã kích hoạt là 5 phút
-    const date = dayjs().add(5, "minute");
+    const date = dayjs().add(5, 'minute');
 
     const hasPassWord = await hashPassWord(createUserDto.password);
 
@@ -152,7 +152,7 @@ export class UserService {
     const result = await this.UserModel.find(filter)
       .limit(pageSize)
       .skip(skip)
-      .select("-password -createdAt -updatedAt") // loại bỏ trường password
+      .select('-password -createdAt -updatedAt') // loại bỏ trường password
       .sort(sort as any);
 
     return { result, totalPages };
@@ -161,7 +161,7 @@ export class UserService {
   async findOneByEmail(email: string) {
     return await this.UserModel.findOne({
       email,
-    }).select("-password  -codeId -codeExpired -createdAt -updatedAt   ");
+    }).select('-password  -codeId -codeExpired -createdAt -updatedAt   ');
   }
 
   async findOne(_id: mongoose.Types.ObjectId) {
@@ -180,10 +180,10 @@ export class UserService {
 
   async remove(_id: string) {
     const user = await this.UserModel.findById(_id).select(
-      "-password  -codeId -codeExpired -createdAt -updatedAt  -isActive -isAdmin ",
+      '-password  -codeId -codeExpired -createdAt -updatedAt  -isActive -isAdmin ',
     );
     if (!user) {
-      throw new BadRequestException("not found user !!");
+      throw new BadRequestException('not found user !!');
     }
 
     await this.UserModel.deleteOne({ _id });
@@ -200,7 +200,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new UnauthorizedException("Not Found User !!");
+      throw new UnauthorizedException('Not Found User !!');
     }
 
     try {
@@ -212,23 +212,23 @@ export class UserService {
               codeId: data.codeId,
             },
             {
-              codeId: "",
+              codeId: '',
               isActive: true,
               codeExpired: dayjs(),
             },
           );
           return {
-            user: "active successfull",
+            user: 'active successfull',
           };
         } else {
-          throw new BadRequestException("CodeId đã hết hạn !!");
+          throw new BadRequestException('CodeId đã hết hạn !!');
 
           //return {
           //  user: 'CodeId đã hết hạn !!',
           //};
         }
       } else {
-        throw new BadRequestException("CodeId không đúng !!");
+        throw new BadRequestException('CodeId không đúng !!');
       }
 
       //await this.handleActiveAccount(user, data);
@@ -242,13 +242,13 @@ export class UserService {
     const user = await this.findOneByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException("Not Found User !!");
+      throw new UnauthorizedException('Not Found User !!');
     }
     // Tạo một UUID để làm mã kích hoạt người dùng
     const IdCode = uuidv4();
 
     // Thiết lập thời gian hết hạn của mã kích hoạt là 5 phút
-    const date = dayjs().add(5, "minute");
+    const date = dayjs().add(5, 'minute');
 
     try {
       this.sendCodeIdToEmail(user, IdCode);
@@ -274,14 +274,14 @@ export class UserService {
   async resetPassword(email: string) {
     const user = await this.findOneByEmail(email);
     if (!user) {
-      throw new UnauthorizedException("Not Found User !!");
+      throw new UnauthorizedException('Not Found User !!');
     }
 
     // Tạo một UUID để làm mã kích hoạt người dùng
     const codeId = uuidv4();
 
     // Thiết lập thời gian hết hạn của mã kích hoạt là 5 phút
-    const date = dayjs().add(5, "minute");
+    const date = dayjs().add(5, 'minute');
 
     try {
       this.sendCodeIdToEmail(user, codeId);
@@ -311,7 +311,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException("Not Found User !!");
+      throw new BadRequestException('Not Found User !!');
     }
 
     try {
@@ -321,7 +321,7 @@ export class UserService {
         throw error;
       } else {
         throw new BadRequestException(
-          "An error occurred while processing the request.",
+          'An error occurred while processing the request.',
         );
       }
     }

@@ -1,15 +1,15 @@
-import { InjectModel } from "@nestjs/mongoose";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { InjectModel } from '@nestjs/mongoose';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
-import mongoose, { Model } from "mongoose";
-import { Product } from "@/modules/product/schema/product-model.schema";
-import { CreateProductDto } from "@/modules/product/dto/create-product-model.dto";
-import { UpdateProductModelDto } from "@/modules/product/dto/update-product-model.dto";
-import aqp from "api-query-params";
-import { CommentDTO } from "@/modules/product/dto/CommentDTO.dto";
-import { ReplyCommentDTO } from "@/modules/product/dto/RepCommentDTO.dto";
-import { CloudinaryService } from "@/cloundinary/cloundinary.service";
-import { TypeFolderClouldinary } from "@/utils/constants";
+import mongoose, { Model } from 'mongoose';
+import { Product } from '@/modules/product/schema/product-model.schema';
+import { CreateProductDto } from '@/modules/product/dto/create-product-model.dto';
+import { UpdateProductModelDto } from '@/modules/product/dto/update-product-model.dto';
+import aqp from 'api-query-params';
+import { CommentDTO } from '@/modules/product/dto/CommentDTO.dto';
+import { ReplyCommentDTO } from '@/modules/product/dto/RepCommentDTO.dto';
+import { CloudinaryService } from '@/cloundinary/cloundinary.service';
+import { TypeFolderClouldinary } from '@/utils/constants';
 
 @Injectable()
 export class ProductModelService {
@@ -20,7 +20,7 @@ export class ProductModelService {
 
   async create(CreateProductDto: CreateProductDto) {
     try {
-      const namePhone = CreateProductDto.name.split(" ").join("-");
+      const namePhone = CreateProductDto.name.split(' ').join('-');
 
       const slug = `${namePhone}-${CreateProductDto.ram}-${CreateProductDto.rom}`;
 
@@ -66,7 +66,7 @@ export class ProductModelService {
       .find(filter)
       .limit(pageSize)
       .skip(skip)
-      .select("-password -createdAt -updatedAt") // loại bỏ trường password
+      .select('-password -createdAt -updatedAt') // loại bỏ trường password
       .sort(sort as any);
 
     return { result, totalPages };
@@ -76,7 +76,7 @@ export class ProductModelService {
     const product = await this.productModel.findOne({ slug });
 
     if (!product) {
-      throw new BadRequestException("Not Found Product !");
+      throw new BadRequestException('Not Found Product !');
     }
 
     return product;
@@ -100,7 +100,7 @@ export class ProductModelService {
         updateProductModelDto.rom
       ) {
         const namePhone =
-          updateProductModelDto?.name.split(" ").join("-") ?? product.name;
+          updateProductModelDto?.name.split(' ').join('-') ?? product.name;
 
         const ram = updateProductModelDto.ram ?? product.ram;
         const rom = updateProductModelDto.rom ?? product.rom;
@@ -146,15 +146,14 @@ export class ProductModelService {
   async SearchProduct(name: string) {
     try {
       const product = await this.productModel.find({
-        name: { $regex: name, $options: "i" },
+        name: { $regex: name, $options: 'i' },
       });
 
       if (product?.length === 0) {
-        return { message: " khong tim thay sp" };
+        return { message: ' khong tim thay sp' };
       }
       return product;
     } catch (error) {
-      console.log("error:", error);
       throw new BadRequestException(error);
     }
   }
@@ -172,7 +171,6 @@ export class ProductModelService {
   }
 
   async CommentProduct(slug: any, comment: CommentDTO) {
-    console.log("comment:", comment);
     const product = await this.findOne(slug);
 
     try {
@@ -195,7 +193,7 @@ export class ProductModelService {
     });
 
     if (findIndexComment === -1) {
-      throw new BadRequestException("Not Found Comment !");
+      throw new BadRequestException('Not Found Comment !');
     }
     try {
       await product.comments[findIndexComment].replies.push(comment);

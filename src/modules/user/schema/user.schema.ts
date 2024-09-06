@@ -1,6 +1,7 @@
-import { Product } from "@/modules/product/schema/product-model.schema";
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import { Product } from '@/modules/product/schema/product-model.schema';
+import { Roles_Type } from '@/public/DecoratorCustom';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -30,8 +31,8 @@ export class User {
   @Prop()
   phone: string;
 
-  @Prop({ default: false })
-  isAdmin: boolean;
+  @Prop({ default: Roles_Type.USER })
+  roles: Roles_Type;
 
   // ======================    Cart  =================================
   @Prop({})

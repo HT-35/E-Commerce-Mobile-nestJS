@@ -12,6 +12,7 @@ import {
   UploadedFile,
   BadRequestException,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 
 import { CreateProductDto } from '@/modules/product/dto/create-product-model.dto';
@@ -27,6 +28,7 @@ export class ProductModelController {
   constructor(private readonly productModelService: ProductModelService) {}
 
   @Get()
+  @Roles(Roles_Type.ADMIN, Roles_Type.USER)
   @ResponseMessage('Find All Product')
   findAll(
     @Query() query: string,
@@ -40,13 +42,6 @@ export class ProductModelController {
   @Roles(Roles_Type.ADMIN)
   @ResponseMessage('Create Product')
   create(@Body() CreateProductDto: CreateProductDto, @Request() req: any) {
-    console.log('');
-    console.log('');
-    console.log('req', req.user);
-    console.log('');
-    console.log('');
-    console.log('');
-
     return req.user;
 
     //return this.productModelService.create(CreateProductDto);
@@ -95,13 +90,6 @@ export class ProductModelController {
   @Post('/comment/:slug')
   @ResponseMessage('Comment of Product')
   CommentProduct(@Param('slug') slug: any, @Body() comment: CommentDTO) {
-    console.log('');
-    console.log('');
-    console.log('');
-    console.log('>> controll comment:', comment);
-    console.log('');
-    console.log('');
-    console.log('');
     return this.productModelService.CommentProduct(slug, comment);
   }
 
@@ -111,7 +99,6 @@ export class ProductModelController {
     @Param('slug') slug: any,
     @Body() comment: ReplyCommentDTO,
   ) {
-    console.log('comment:', comment);
     return this.productModelService.ReplyCommentProduct(slug, comment);
   }
 

@@ -5,38 +5,37 @@ import {
   HttpException,
   HttpStatus,
   UploadedFiles,
-} from "@nestjs/common";
+} from '@nestjs/common';
 
-import { FileFieldsInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { extname } from "path";
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
-@Controller("file")
+@Controller('file')
 export class FileController {
-  @Post("upload")
+  @Post('upload')
   @UseInterceptors(
     FileFieldsInterceptor(
       // pipe
       [
-        { name: "img", maxCount: 5 },
-        { name: "pdf", maxCount: 1 },
+        { name: 'img', maxCount: 5 },
+        { name: 'pdf', maxCount: 1 },
       ],
       {
         // config path
         storage: diskStorage({
           destination: (req, file, callback) => {
-            if (file.fieldname === "img") {
-              callback(null, "./uploads/img");
-            } else if (file.fieldname === "pdf") {
-              callback(null, "./uploads/pdf");
+            if (file.fieldname === 'img') {
+              callback(null, './uploads/img');
+            } else if (file.fieldname === 'pdf') {
+              callback(null, './uploads/pdf');
             }
           },
           filename: (req, file, callback) => {
-            console.log(file);
             const randomName = Array(5)
               .fill(null)
               .map(() => Math.round(Math.random() * 16).toString(16))
-              .join("");
+              .join('');
             //Calling the callback passing the random name generated with the original extension name
             callback(null, `${randomName}-${file.originalname}`);
           },
@@ -44,12 +43,12 @@ export class FileController {
         // config name IMG
         fileFilter: (req, file, cb) => {
           if (
-            file.fieldname === "img" &&
+            file.fieldname === 'img' &&
             file.mimetype.match(/\/(jpg|jpeg|png)$/)
           ) {
             cb(null, true);
           } else if (
-            file.fieldname === "pdf" &&
+            file.fieldname === 'pdf' &&
             file.mimetype.match(/\/(pdf)$/)
           ) {
             cb(null, true);
@@ -74,7 +73,6 @@ export class FileController {
       pdf?: Express.Multer.File[];
     },
   ) {
-    console.log(files);
     return files;
   }
 }

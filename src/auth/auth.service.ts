@@ -1,12 +1,12 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { CreateAuthDto } from "./dto/create-auth.dto";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { CreateAuthDto } from './dto/create-auth.dto';
 
-import { UserService } from "@/modules/user/user.service";
-import { LoginAuthDto } from "@/auth/dto/LoginAuth.dto";
-import { JwtService } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
-import { ActiveAccount } from "@/auth/dto/activeAccount.dto";
-import { NewPasswordDto } from "@/auth/dto/NewPasswordDto.dto";
+import { UserService } from '@/modules/user/user.service';
+import { LoginAuthDto } from '@/auth/dto/LoginAuth.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { ActiveAccount } from '@/auth/dto/activeAccount.dto';
+import { NewPasswordDto } from '@/auth/dto/NewPasswordDto.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +19,7 @@ export class AuthService {
   async validateUser(loginAuthDto: LoginAuthDto) {
     const user = await this.userService.findOneByEmail(loginAuthDto.email);
     if (!user) {
-      throw new UnauthorizedException("not found user !!");
+      throw new UnauthorizedException('not found user !!');
     }
     return user;
   }
@@ -33,12 +33,13 @@ export class AuthService {
       _id: user._id,
       name: user.name,
       email: user.email,
+      roles: user.roles,
     };
 
     const access_token = this.jwtService.sign(payload);
 
     const refesh_token = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get("JWT_Refesh_Token_EXPIRATION_TIME"),
+      expiresIn: this.configService.get('JWT_Refesh_Token_EXPIRATION_TIME'),
     });
 
     return {
@@ -47,6 +48,7 @@ export class AuthService {
       user: {
         name: user.name,
         _id: user._id,
+        roles: user.roles,
       },
     };
   }

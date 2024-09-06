@@ -1,10 +1,10 @@
-import { InjectModel } from "@nestjs/mongoose";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { InjectModel } from '@nestjs/mongoose';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { CloudinaryService } from "@/cloundinary/cloundinary.service";
-import { TypeFolderClouldinary } from "@/utils/constants";
-import { Brand } from "@/modules/brand/schema/brand.schema";
-import mongoose, { Model } from "mongoose";
+import { CloudinaryService } from '@/cloundinary/cloundinary.service';
+import { TypeFolderClouldinary } from '@/utils/constants';
+import { Brand } from '@/modules/brand/schema/brand.schema';
+import mongoose, { Model } from 'mongoose';
 
 @Injectable()
 export class BrandService {
@@ -15,10 +15,10 @@ export class BrandService {
 
   async Create(file: Express.Multer.File, name: string) {
     const brand = await this.bandModel.findOne({
-      name: { $regex: new RegExp(name, "i") },
+      name: { $regex: new RegExp(name, 'i') },
     });
 
-    if (brand) throw new BadRequestException("Brand đã tồn tại");
+    if (brand) throw new BadRequestException('Brand đã tồn tại');
 
     try {
       const sendImgCloundinary = await this.cloudinary.uploadImage(
@@ -48,7 +48,7 @@ export class BrandService {
     //});
 
     if (!brand) {
-      throw new BadRequestException("Not Found Brand !!");
+      throw new BadRequestException('Not Found Brand !!');
     }
 
     return brand;
@@ -66,10 +66,9 @@ export class BrandService {
     try {
       //delete img in cloudinary
       const deleteImg = await this.cloudinary.deleteImage(brand.cloudinary_id);
-      console.log("deleteImg:", deleteImg);
 
       //return deleteImg;
-      if (deleteImg.result === "ok") {
+      if (deleteImg.result === 'ok') {
         const newImg = await this.cloudinary.uploadImage(
           file,
           TypeFolderClouldinary.BRAND,

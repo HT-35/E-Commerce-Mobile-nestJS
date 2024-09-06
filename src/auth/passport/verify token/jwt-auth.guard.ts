@@ -1,16 +1,16 @@
-import { Is_Public_Key } from "@/public/DecoratorCustom";
+import { Is_Public_Key } from '@/public/DecoratorCustom';
 import {
   BadRequestException,
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { AuthGuard } from "@nestjs/passport";
-import { Observable } from "rxjs";
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { AuthGuard } from '@nestjs/passport';
+import { Observable } from 'rxjs';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard("jwt") {
+export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
     super();
   }
@@ -36,15 +36,15 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     context: ExecutionContext,
   ): TUser {
     const req = context.switchToHttp().getRequest();
-    const [, token] = req.headers.authorization?.split(" ") ?? [];
+    const [, token] = req.headers.authorization?.split(' ') ?? [];
 
     if (!token) {
-      throw new BadRequestException("Vui Lòng Đăng Nhập !!");
+      throw new BadRequestException('Vui Lòng Đăng Nhập !!');
     } else if (err || !user) {
       throw (
         err ||
         new UnauthorizedException(
-          "Token hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.",
+          'Token hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.',
         )
       );
     }
