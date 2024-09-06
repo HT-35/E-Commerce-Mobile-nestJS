@@ -6,6 +6,7 @@ import {
   ValidateNested,
   IsArray,
   IsMongoId,
+  IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -60,81 +61,80 @@ class CreateCommentProductDto {
 }
 
 export class CreateProductDto {
+  @IsNotEmpty()
   @IsString()
   name: string;
 
+  @IsNotEmpty()
   @IsNumber()
   price: number;
 
+  @IsNotEmpty()
   @IsNumber()
   salePrice: number;
 
+  @IsNotEmpty()
   @IsString()
   type: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  image?: string;
+  image: string;
 
-  @IsOptional()
-  @IsNumber()
-  amount?: number;
-
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  cloudinary_id?: string;
+  cloudinary_id: string;
 
-  @IsOptional()
+  @IsNotEmpty()
+  @IsNotEmpty()
   @IsNumber()
-  rating?: number;
-
-  @IsOptional()
-  @IsNumber()
-  numReviews?: number;
+  amount: number;
 
   @IsOptional()
   @IsString()
   blog?: string;
 
   @IsArray()
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateReviewProductDto)
-  reviews: CreateReviewProductDto[];
+  reviews?: CreateReviewProductDto[];
 
   @IsArray()
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateCommentProductDto)
-  comments: CreateCommentProductDto[];
+  comments?: CreateCommentProductDto[];
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  os?: string;
+  os: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  ram?: string;
+  ram: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  battery?: string;
+  battery: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  rom?: string;
+  rom: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  camera?: string;
+  camera: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  special?: string;
+  special: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  design?: string;
+  design: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  screen?: string;
+  screen: string;
 }

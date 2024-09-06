@@ -3,6 +3,9 @@ import mongoose from 'mongoose';
 
 export class ReplyCommentDTO {
   @IsNotEmpty()
+  idComment: string;
+
+  @IsNotEmpty()
   content: string;
   @IsNotEmpty()
   isAdmin: boolean;

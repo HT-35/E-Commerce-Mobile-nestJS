@@ -68,20 +68,14 @@ export class Product {
   @Prop({ type: String, required: true })
   type: string;
 
-  @Prop({ type: String })
-  image: string;
-
   @Prop({ type: Number })
   amount: number;
 
-  @Prop({ type: String })
+  @Prop({ type: String }) // Link hình ảnh
+  image: string;
+
+  @Prop({ type: String }) // id hình ảnh tại cloundinary
   cloudinary_id: string;
-
-  @Prop({ type: Number })
-  rating: number;
-
-  @Prop({ type: Number })
-  numReviews: number;
 
   @Prop({ type: String })
   blog: string;

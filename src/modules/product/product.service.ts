@@ -8,11 +8,14 @@ import { UpdateProductModelDto } from '@/modules/product/dto/update-product-mode
 import aqp from 'api-query-params';
 import { CommentDTO } from '@/modules/product/dto/CommentDTO.dto';
 import { ReplyCommentDTO } from '@/modules/product/dto/RepCommentDTO.dto';
+import { CloudinaryService } from '@/cloundinary/cloundinary.service';
+import { TypeFolderClouldinary } from '@/utils/constants';
 
 @Injectable()
 export class ProductModelService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async create(CreateProductDto: CreateProductDto) {
@@ -124,6 +127,8 @@ export class ProductModelService {
   async remove(slug: string) {
     const produc = await this.findOne(slug);
 
+    await this.cloudinaryService.deleteImage(produc.cloudinary_id);
+
     try {
       const removeProduct = await this.productModel.deleteOne({ slug });
       if (removeProduct.deletedCount > 0) {
@@ -167,6 +172,7 @@ export class ProductModelService {
   }
 
   async CommentProduct(slug: any, comment: CommentDTO) {
+    console.log('comment:', comment);
     const product = await this.findOne(slug);
 
     try {
@@ -175,13 +181,13 @@ export class ProductModelService {
       const updateCommentProduct = await product.save();
       return updateCommentProduct;
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
   }
   async ReplyCommentProduct(slug: any, comment: ReplyCommentDTO) {
     const product = await this.findOne(slug);
 
-    const _idComnent = new mongoose.Types.ObjectId('66d7d1f6c8b1bd4eeae2072e');
+    const _idComnent = new mongoose.Types.ObjectId(comment.idComment);
     //const _idComnent = 123;
 
     const findIndexComment = product.comments.findIndex((item: any) => {
@@ -204,5 +210,12 @@ export class ProductModelService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  async uploadImg(file: Express.Multer.File) {
+    return await this.cloudinaryService.uploadImage(
+      file,
+      TypeFolderClouldinary.PRODUCT,
+    );
   }
 }

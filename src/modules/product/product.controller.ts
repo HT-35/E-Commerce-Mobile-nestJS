@@ -8,14 +8,18 @@ import {
   Delete,
   Query,
   BadGatewayException,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
-import { ProductModelService } from './product.service';
 
 import { CreateProductDto } from '@/modules/product/dto/create-product-model.dto';
 import { UpdateProductModelDto } from '@/modules/product/dto/update-product-model.dto';
 import { ResponseMessage } from '@/public/DecoratorCustom';
 import { CommentDTO } from '@/modules/product/dto/CommentDTO.dto';
 import { ReplyCommentDTO } from '@/modules/product/dto/RepCommentDTO.dto';
+import { ProductModelService } from '@/modules/product/product.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('product')
 export class ProductModelController {
@@ -80,6 +84,13 @@ export class ProductModelController {
   @Post('/comment/:slug')
   @ResponseMessage('Comment of Product')
   CommentProduct(@Param('slug') slug: any, @Body() comment: CommentDTO) {
+    console.log('');
+    console.log('');
+    console.log('');
+    console.log('>> controll comment:', comment);
+    console.log('');
+    console.log('');
+    console.log('');
     return this.productModelService.CommentProduct(slug, comment);
   }
 
@@ -97,5 +108,13 @@ export class ProductModelController {
   @ResponseMessage('Delete Product !')
   remove(@Param('slug') slug: string) {
     return this.productModelService.remove(slug);
+  }
+
+  @Post('/img')
+  @UseInterceptors(FileInterceptor('file'))
+  @ResponseMessage('Img Product')
+  uploadImg(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Missing Img');
+    return this.productModelService.uploadImg(file);
   }
 }

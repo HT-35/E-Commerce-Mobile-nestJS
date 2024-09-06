@@ -4,7 +4,6 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from '@/core/transform.interceptor';
 import { JwtAuthGuard } from '@/auth/passport/verify token/jwt-auth.guard';
-import { AllExceptionsFilter } from '@/core/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

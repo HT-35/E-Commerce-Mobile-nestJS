@@ -6,10 +6,12 @@ import {
   Product,
   ProductSchema,
 } from '@/modules/product/schema/product-model.schema';
+import { CloudinaryModule } from '@/cloundinary/cloundinary.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+    CloudinaryModule,
   ],
   controllers: [ProductModelController],
   providers: [ProductModelService],
