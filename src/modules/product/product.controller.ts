@@ -1,3 +1,4 @@
+import { IsPublic } from './../../public/DecoratorCustom';
 import {
   Controller,
   Get,
@@ -12,7 +13,6 @@ import {
   UploadedFile,
   BadRequestException,
   Request,
-  UseGuards,
 } from '@nestjs/common';
 
 import { CreateProductDto } from '@/modules/product/dto/create-product-model.dto';
@@ -25,10 +25,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('product')
 export class ProductModelController {
-  constructor(private readonly productModelService: ProductModelService) {}
+  constructor(private readonly productModelService: ProductModelService) { }
 
   @Get()
-  @Roles(Roles_Type.ADMIN, Roles_Type.USER)
+  //@Roles(Roles_Type.ADMIN, Roles_Type.USER)
+  @IsPublic()
   @ResponseMessage('Find All Product')
   findAll(
     @Query() query: string,
