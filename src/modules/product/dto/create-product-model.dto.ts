@@ -2,15 +2,35 @@ import {
   IsString,
   IsNumber,
   IsBoolean,
-  IsOptional,
-  ValidateNested,
   IsArray,
   IsMongoId,
-  IsNotEmpty,
+  ValidateNested,
+  IsOptional,
 } from "class-validator";
 import { Type } from "class-transformer";
 
-class CreateReviewProductDto {
+class OptionDTO {
+  @IsString()
+  color: string;
+
+  @IsString()
+  price: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ImageDTO)
+  img: ImageDTO[];
+}
+
+class ImageDTO {
+  @IsString()
+  link: string;
+
+  @IsString()
+  cloudinary_id: string;
+}
+
+class ReviewProductDTO {
   @IsString()
   name: string;
 
@@ -21,7 +41,7 @@ class CreateReviewProductDto {
   star: number;
 }
 
-class CreateReplieCommentProductDto {
+class ReplieCommentProductDTO {
   @IsString()
   content: string;
 
@@ -32,10 +52,10 @@ class CreateReplieCommentProductDto {
   nameUser: string;
 
   @IsMongoId()
-  byUser: string; // Sử dụng string vì DTO không làm việc trực tiếp với ObjectId của mongoose
+  byUser: string;
 }
 
-class CreateCommentProductDto {
+class CommentProductDTO {
   @IsString()
   author: string;
 
@@ -52,89 +72,67 @@ class CreateCommentProductDto {
   content: string;
 
   @IsMongoId()
-  byUser: string; // Sử dụng string vì DTO không làm việc trực tiếp với ObjectId của mongoose
+  byUser: string;
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateReplieCommentProductDto)
-  replies: CreateReplieCommentProductDto[];
+  @Type(() => ReplieCommentProductDTO)
+  replies: ReplieCommentProductDTO[];
 }
 
 export class CreateProductDto {
-  @IsNotEmpty()
   @IsString()
   name: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  price: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  salePrice: number;
-
-  @IsNotEmpty()
   @IsString()
-  type: string;
+  brand: string;
 
-  @IsNotEmpty()
-  @IsString()
-  image: string;
-
-  @IsNotEmpty()
-  @IsString()
-  cloudinary_id: string;
-
-  @IsNotEmpty()
-  @IsNotEmpty()
   @IsNumber()
   amount: number;
 
-  @IsOptional()
-  @IsString()
-  blog?: string;
-
-  @IsArray()
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => CreateReviewProductDto)
-  reviews?: CreateReviewProductDto[];
-
-  @IsArray()
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => CreateCommentProductDto)
-  comments?: CreateCommentProductDto[];
-
-  @IsNotEmpty()
   @IsString()
   os: string;
 
-  @IsNotEmpty()
   @IsString()
   ram: string;
 
-  @IsNotEmpty()
   @IsString()
   battery: string;
 
-  @IsNotEmpty()
   @IsString()
   rom: string;
 
-  @IsNotEmpty()
   @IsString()
-  camera: string;
+  cameraBefore: string;
 
-  @IsNotEmpty()
+  @IsString()
+  cameraAfter: string;
+
   @IsString()
   special: string;
 
-  @IsNotEmpty()
-  @IsString()
-  design: string;
-
-  @IsNotEmpty()
   @IsString()
   screen: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OptionDTO)
+  option: OptionDTO[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ReviewProductDTO)
+  reviews: ReviewProductDTO[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CommentProductDTO)
+  comments: CommentProductDTO[];
+
+  @IsOptional() // Đây là trường duy nhất không bắt buộc
+  @IsString()
+  blog?: string;
+
+  @IsString()
+  slug: string;
 }

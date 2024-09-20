@@ -4,6 +4,18 @@ import mongoose, { HydratedDocument } from "mongoose";
 export type ProductDocument = HydratedDocument<Product>;
 
 @Schema({ timestamps: true })
+class Option {
+  color: string;
+  price: string;
+  img: [
+    {
+      link: string;
+      cloudinary_id: string;
+    },
+  ];
+}
+
+@Schema({ timestamps: true })
 class ReviewProduct {
   @Prop({ type: String, required: true })
   name: string;
@@ -59,23 +71,11 @@ export class Product {
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ type: Number, required: true })
-  price: number;
-
-  @Prop({ type: Number, required: true })
-  salePrice: number;
-
   @Prop({ type: String, required: true })
-  type: string;
+  brand: string;
 
   @Prop({ type: Number })
   amount: number;
-
-  @Prop({ type: String }) // Link hình ảnh
-  image: string;
-
-  @Prop({ type: String }) // id hình ảnh tại cloundinary
-  cloudinary_id: string;
 
   @Prop({ type: String })
   blog: string;
@@ -99,16 +99,19 @@ export class Product {
   rom: string;
 
   @Prop({ type: String })
-  camera: string;
+  cameraBefore: string;
+
+  @Prop({ type: String })
+  cameraAfter: string;
 
   @Prop({ type: String })
   special: string;
 
   @Prop({ type: String })
-  design: string;
-
-  @Prop({ type: String })
   screen: string;
+
+  @Prop({})
+  option: Option[];
 
   // system generator  =  name  + ram  + rom
   @Prop({ type: String, required: true, unique: true })

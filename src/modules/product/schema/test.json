@@ -1,0 +1,82 @@
+{
+  "name": "Smartphone Pro Max",
+  "amount": 50,
+  "blog": "This is a flagship smartphone with the latest features.",
+  "reviews": [
+    {
+      "name": "John Doe",
+      "comment": "Great product, highly recommended!",
+      "star": 5
+    },
+    {
+      "name": "Jane Smith",
+      "comment": "Good value for money.",
+      "star": 4
+    }
+  ],
+  "comments": [
+    {
+      "author": "Mike Johnson",
+      "status": "approved",
+      "isAdmin": false,
+      "avatar": "https://example.com/avatar1.jpg",
+      "content": "Does this phone support 5G?",
+      "byUser": "650f82f4f3a644bc1c8d30b6",
+      "replies": [
+        {
+          "content": "Yes, it supports 5G.",
+          "isAdmin": true,
+          "nameUser": "Admin",
+          "byUser": "650f82f4f3a644bc1c8d30b7"
+        }
+      ]
+    }
+  ],
+  "os": "Android 12",
+  "ram": "8GB",
+  "battery": "5000mAh",
+  "rom": "128GB",
+  "cameraBefore": "32MP",
+  "cameraAfter": "108MP + 12MP + 8MP",
+  "special": "Fast charging, 5G support",
+  "screen": "6.7 inch AMOLED",
+  "option": [
+    {
+      "color": "Black",
+      "price": "999",
+      "img": [
+        {
+          "link": "https://example.com/product-black_1.jpg",
+          "cloudinary_id": "black_product_image_id_1"
+        },
+        {
+          "link": "https://example.com/product-black_2.jpg",
+          "cloudinary_id": "black_product_image_id_2"
+        },
+        {
+          "link": "https://example.com/product-black_3.jpg",
+          "cloudinary_id": "black_product_image_id_3"
+        }
+      ]
+    },
+    {
+      "color": "White",
+      "price": "999",
+      "img": [
+        {
+          "link": "https://example.com/product-white_1.jpg",
+          "cloudinary_id": "white_product_image_id_1"
+        },
+        {
+          "link": "https://example.com/product-white_2.jpg",
+          "cloudinary_id": "white_product_image_id_2"
+        },
+        {
+          "link": "https://example.com/product-white_3.jpg",
+          "cloudinary_id": "white_product_image_id_3"
+        }
+      ]
+    }
+  ],
+  "slug": "smartphone-pro-max-8gb-128gb"
+}
