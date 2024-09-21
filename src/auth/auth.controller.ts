@@ -50,10 +50,11 @@ export class AuthController {
   @IsPublic()
   @ResponseMessage("Re-Send OTP")
   ReSendCodeId(@Query("email") email: string) {
+    console.log("email: >>", email);
     return this.authService.ReSendCodeId(email);
   }
 
-  // ===== Forget Password =================================================================================
+  // ===== get new Password =================================================================================
   @Post("reset-password")
   @IsPublic()
   @ResponseMessage("Reset Password")

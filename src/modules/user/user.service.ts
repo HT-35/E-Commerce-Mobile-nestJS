@@ -45,6 +45,8 @@ export class UserService {
       if (dayjs().isBefore(user.codeExpired)) {
         // Trường hợp: Quên mật khẩu (Forget Password)
         if (dataClient.password) {
+          const hashPassword = await hashPassWord(dataClient.password);
+
           await this.UserModel.updateOne(
             {
               _id: dataClient.id,
@@ -53,7 +55,7 @@ export class UserService {
             {
               codeId: "",
               isActive: true,
-              password: dataClient.password,
+              password: hashPassword,
               codeExpired: dayjs(),
             },
           );
