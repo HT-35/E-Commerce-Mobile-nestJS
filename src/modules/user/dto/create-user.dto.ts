@@ -21,4 +21,6 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   phone?: string;
+
+  //roles?: Roles_Type;
 }

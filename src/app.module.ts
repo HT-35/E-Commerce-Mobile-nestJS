@@ -10,7 +10,6 @@ import { MailerModule } from "@nestjs-modules/mailer";
 
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { FileModule } from "./modules/file/file.module";
-import { BrandModule } from "./modules/brand/brand.module";
 import { CloudinaryModule } from "@/cloundinary/cloundinary.module";
 
 @Module({
@@ -64,7 +63,7 @@ import { CloudinaryModule } from "@/cloundinary/cloundinary.module";
     AuthModule,
     ProductModule,
     FileModule,
-    BrandModule,
+
     CloudinaryModule,
   ],
   controllers: [AppController],

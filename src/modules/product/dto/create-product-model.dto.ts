@@ -132,7 +132,4 @@ export class CreateProductDto {
   @IsOptional() // Đây là trường duy nhất không bắt buộc
   @IsString()
   blog?: string;
-
-  @IsString()
-  slug: string;
 }

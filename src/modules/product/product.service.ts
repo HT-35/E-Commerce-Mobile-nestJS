@@ -73,7 +73,8 @@ export class ProductModelService {
   }
 
   async findOne(slug: string) {
-    const product = await this.productModel.findOne({ slug });
+    const regex = new RegExp(slug, "i");
+    const product = await this.productModel.findOne({ slug: regex });
 
     if (!product) {
       throw new BadRequestException("Not Found Product !");
@@ -83,14 +84,22 @@ export class ProductModelService {
   }
 
   async filterProductByType(brand: string) {
+    const regex = new RegExp(brand, "i");
     try {
-      return await this.productModel.find({ brand });
+      return await this.productModel.find({ brand: regex });
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
   async update(slug: string, updateProductModelDto: UpdateProductModelDto) {
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log("updateProductModelDto:", updateProductModelDto);
+    console.log("");
+    console.log("");
+    console.log("");
     const product = await this.findOne(slug);
 
     try {
@@ -115,7 +124,10 @@ export class ProductModelService {
 
         return await this.findOne(newSlug);
       } else {
-        await this.productModel.updateOne({ slug }, { updateProductModelDto });
+        await this.productModel.updateOne(
+          { slug },
+          { ...updateProductModelDto },
+        );
         await this.productModel.syncIndexes();
         return await this.findOne(slug);
       }
@@ -127,7 +139,13 @@ export class ProductModelService {
   async remove(slug: string) {
     const produc = await this.findOne(slug);
 
-    //await this.cloudinaryService.deleteImage(produc.cloudinary_id);
+    await Promise.all(
+      produc.option.map(async (item) => {
+        for (const imgItem of item.img) {
+          await this.cloudinaryService.deleteImage(imgItem.cloudinary_id);
+        }
+      }),
+    );
 
     try {
       const removeProduct = await this.productModel.deleteOne({ slug });
@@ -136,6 +154,7 @@ export class ProductModelService {
           delete: produc,
         };
       }
+      return produc;
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -210,10 +229,23 @@ export class ProductModelService {
     }
   }
 
-  async uploadImg(file: Express.Multer.File) {
-    return await this.cloudinaryService.uploadImage(
-      file,
-      TypeFolderClouldinary.PRODUCT,
+  async uploadImg(files: Express.Multer.File[]) {
+    console.log("files:", files);
+
+    const arrFile = await Promise.all(
+      files.map(async (item, index) => {
+        const img = await this.cloudinaryService.uploadImage(
+          item,
+          TypeFolderClouldinary.PRODUCT,
+        );
+
+        return {
+          link: img.secure_url,
+          cloudinary_id: img.public_id,
+        };
+      }),
     );
+
+    return arrFile;
   }
 }
