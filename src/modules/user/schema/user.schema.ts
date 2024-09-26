@@ -1,18 +1,21 @@
 import { Product } from "@/modules/product/schema/product-model.schema";
 import { Roles_Type } from "@/public/DecoratorCustom";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
-export class Cart {
+export class cartItem {
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: Product.name,
-    default: [],
+    required: true,
   })
-  id_Product: mongoose.Schema.Types.ObjectId;
+  slug: string;
+
+  @Prop({ required: true })
+  quatity: number;
 }
 
 @Schema({ timestamps: true })
@@ -35,8 +38,11 @@ export class User {
   roles: Roles_Type;
 
   // ======================    Cart  =================================
-  @Prop({})
-  cart: [Cart];
+  @Prop({
+    type: [cartItem],
+    default: [],
+  })
+  cart: cartItem[];
 
   //  ===========================================    Extend ===================================================
   @Prop({ default: false })

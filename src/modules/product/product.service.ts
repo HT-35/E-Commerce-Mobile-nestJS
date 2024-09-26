@@ -233,7 +233,7 @@ export class ProductModelService {
     console.log("files:", files);
 
     const arrFile = await Promise.all(
-      files.map(async (item, index) => {
+      files.map(async (item) => {
         const img = await this.cloudinaryService.uploadImage(
           item,
           TypeFolderClouldinary.PRODUCT,

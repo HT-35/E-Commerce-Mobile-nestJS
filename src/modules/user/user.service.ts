@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   Injectable,
   UnauthorizedException,
@@ -6,7 +7,7 @@ import {
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectModel } from "@nestjs/mongoose";
-import { User } from "@/modules/user/schema/user.schema";
+import { cartItem, User } from "@/modules/user/schema/user.schema";
 import mongoose, { Model } from "mongoose";
 
 import { v4 as uuidv4 } from "uuid";
@@ -16,6 +17,8 @@ import { MailerService } from "@nestjs-modules/mailer";
 import { ActiveAccount } from "@/auth/dto/activeAccount.dto";
 import { NewPasswordDto } from "@/auth/dto/NewPasswordDto.dto";
 import aqp from "api-query-params";
+import { CreateEmployeeDto } from "@/modules/user/dto/CreateEmployeeDto";
+import { Product } from "@/modules/product/schema/product-model.schema";
 
 @Injectable()
 export class UserService {
@@ -133,6 +136,41 @@ export class UserService {
     //return 'This action adds a new user';
   }
 
+  // đk tài khoản nhân viên hoặc admin
+  async registerEmployee(createEmployeeDto: CreateEmployeeDto) {
+    const existingUser = await this.findOneByEmail(createEmployeeDto.email);
+
+    if (existingUser) {
+      throw new BadRequestException("email đã tồn tại !!");
+    }
+
+    try {
+      await this.UserModel.create({
+        name: createEmployeeDto.name,
+        email: createEmployeeDto.email,
+        password: 1111, // defaul password
+        address: createEmployeeDto.address,
+        phone: createEmployeeDto.phone,
+        roles: createEmployeeDto.roles,
+        //isActive: true,
+      });
+
+      // Đồng bộ hóa các chỉ mục của mô hình trong cơ sở dữ liệu
+      await this.UserModel.syncIndexes();
+
+      const result = await this.findOneByEmail(createEmployeeDto.email);
+
+      return result;
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException(`${error.keyValue.email} đã tồn tại`);
+      }
+      throw new BadRequestException(error);
+    }
+
+    //return 'This action adds a new user';
+  }
+
   async findAll(query: string, current: number, pageSize: number) {
     const { filter, sort } = aqp(query);
 
@@ -165,19 +203,38 @@ export class UserService {
       email,
     }).select("-password  -codeId -codeExpired -createdAt -updatedAt -cart  ");
   }
+  async searchUserByName(name: string) {
+    const regex = new RegExp(name, "i");
+    return await this.UserModel.find({
+      name: regex,
+    }).select("-password  -codeId -codeExpired -createdAt -updatedAt -cart  ");
+  }
 
   async findOne(_id: mongoose.Types.ObjectId) {
     try {
       return this.UserModel.findOne({
         _id,
-      });
+      }).select("-password  -codeId -codeExpired -createdAt -updatedAt  ");
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  update(id: mongoose.Types.ObjectId, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} ${updateUserDto} user`;
+  async update(id: mongoose.Types.ObjectId, updateUserDto: UpdateUserDto) {
+    const user = await this.findOne(id);
+
+    if (!user) {
+      throw new BadRequestException("Not Found User");
+    }
+
+    try {
+      await this.UserModel.updateOne({ _id: id }, { ...updateUserDto });
+
+      await this.UserModel.syncIndexes();
+      return await this.findOne(id);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async remove(_id: string) {
@@ -326,6 +383,150 @@ export class UserService {
           "An error occurred while processing the request.",
         );
       }
+    }
+  }
+
+  //   =========    Cart
+
+  async getAllProductInCart(_id: mongoose.Types.ObjectId) {
+    try {
+      console.log(`_id:`, _id);
+      //const user = await this.findOne(_id);
+
+      const user = await this.UserModel.findOne({ _id }).populate({
+        path: "cart.slug", // Đi đến slug trong cart
+        model: Product.name, // Model Product
+        localField: "cart.slug", // Trường trong model User (cart.slug)
+        foreignField: "slug", // Trường trong model Product
+      });
+
+      if (!user) {
+        throw new BadGatewayException("Not Found User !");
+      }
+
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async addProductInCart(data: cartItem, _id: mongoose.Types.ObjectId) {
+    try {
+      const user = await this.findOne(_id);
+      if (!user) {
+        throw new BadGatewayException("Not Found User !");
+      }
+      let newCart: cartItem[];
+      if (user.cart.length === 0) {
+        newCart = [{ quatity: data.quatity, slug: data.slug }];
+      } else {
+        const checkProduct = user.cart.some((item) => {
+          if (item.slug === data.slug) {
+            console.log(`item:`, item);
+            return true;
+          } else {
+            return false;
+          }
+        });
+        if (checkProduct) {
+          user.cart.forEach((item, index) => {
+            if (item.slug === data.slug) {
+              newCart = [
+                ...user.cart,
+                {
+                  quatity: Number(Number(data.quatity) + Number(item.quatity)),
+                  slug: data.slug,
+                },
+              ];
+              delete newCart[index];
+              //console.log(`newCart:`, newCart);
+            }
+          });
+        } else {
+          newCart = [...user.cart, { quatity: data.quatity, slug: data.slug }];
+        }
+        console.log(`checkProduct:`, checkProduct);
+      }
+
+      //console.log(`newCart:`, newCart);
+
+      user.cart = newCart;
+      const saveCart = await user.save();
+      await this.UserModel.syncIndexes();
+      return saveCart;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async reduceProductQuanlityInCart(
+    data: cartItem,
+    _id: mongoose.Types.ObjectId,
+  ) {
+    const user = await this.findOne(_id);
+    if (!user) {
+      throw new BadGatewayException("Not Found User !");
+    }
+    let newCart: cartItem[];
+    if (user.cart.length === 0) {
+      throw new BadRequestException("Nothing Product In Cart");
+    }
+
+    user.cart.forEach((item, index) => {
+      if (item.slug === data.slug) {
+        console.log(`item:`, item.quatity);
+        console.log(`data:`, data.quatity);
+        if (item.quatity === 1) {
+          throw new BadRequestException("Quanlity Product Min : 1");
+        }
+
+        newCart = [
+          ...user.cart,
+          {
+            quatity: Number(Number(item.quatity) - Number(data.quatity)),
+            slug: data.slug,
+          },
+        ];
+        delete newCart[index];
+      }
+    });
+    try {
+      user.cart = newCart;
+      const saveCart = await user.save();
+      await this.UserModel.syncIndexes();
+      return saveCart;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async deleteProductQuanlityInCart(
+    slug: string,
+    _id: mongoose.Types.ObjectId,
+  ) {
+    console.log(`slug:`, slug);
+    try {
+      const user = await this.findOne(_id);
+
+      if (!user) {
+        throw new BadRequestException("Not Found User !");
+      }
+
+      let newCart: cartItem[];
+      user.cart.forEach((item, index) => {
+        if (item.slug === slug) {
+          newCart = [...user.cart];
+          delete newCart[index];
+        }
+      });
+
+      user.cart = newCart;
+      await user.save();
+      await this.UserModel.syncIndexes();
+
+      return await this.getAllProductInCart(_id);
+    } catch (error) {
+      throw new BadRequestException(error);
     }
   }
 }
