@@ -404,7 +404,7 @@ export class UserService {
         throw new BadGatewayException("Not Found User !");
       }
 
-      return user;
+      return user.cart;
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -476,14 +476,19 @@ export class UserService {
       if (item.slug === data.slug) {
         console.log(`item:`, item.quatity);
         console.log(`data:`, data.quatity);
-        if (item.quatity === 1) {
-          throw new BadRequestException("Quanlity Product Min : 1");
-        }
+        //if (item.quatity === 1) {
+        //  throw new BadRequestException("Quanlity Product Min : 1");
+        //}
+
+        const calcQuantity =
+          Number(Number(item.quatity) - Number(data.quatity)) <= 1
+            ? 1
+            : Number(Number(item.quatity) - Number(data.quatity));
 
         newCart = [
           ...user.cart,
           {
-            quatity: Number(Number(item.quatity) - Number(data.quatity)),
+            quatity: calcQuantity,
             slug: data.slug,
           },
         ];
@@ -510,6 +515,9 @@ export class UserService {
 
       if (!user) {
         throw new BadRequestException("Not Found User !");
+      }
+      if (user.cart.length === 0) {
+        return "Cart is empty";
       }
 
       let newCart: cartItem[];

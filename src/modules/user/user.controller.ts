@@ -76,7 +76,7 @@ export class UserController {
   // ========== CART =============================
 
   @Get("/cart")
-  @ResponseMessage("Add Product to Cart")
+  @ResponseMessage("Get Product to Cart")
   getAllProductInCart(@Req() req: any) {
     const { _id } = req.user;
 
@@ -92,12 +92,14 @@ export class UserController {
   }
 
   @Post("/cart/reduce")
+  @ResponseMessage("reduce Product to Cart")
   reduceProductQuanlityInCart(@Body() data: ProductToCartDto, @Req() req: any) {
     const { _id } = req.user;
     return this.userService.reduceProductQuanlityInCart(data, _id);
   }
 
   @Delete("/cart/delete/:slug")
+  @ResponseMessage("Delete Product to Cart")
   deleteProductQuanlityInCart(@Param("slug") slug: string, @Req() req: any) {
     const { _id } = req.user;
 
