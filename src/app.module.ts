@@ -11,6 +11,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { FileModule } from "./modules/file/file.module";
 import { CloudinaryModule } from "@/cloundinary/cloundinary.module";
+import { WebSocketModule } from "./web-socket/chat/web-socket.module";
 
 @Module({
   imports: [
@@ -65,6 +66,8 @@ import { CloudinaryModule } from "@/cloundinary/cloundinary.module";
     FileModule,
 
     CloudinaryModule,
+
+    WebSocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
