@@ -12,6 +12,7 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
 import { FileModule } from "./modules/file/file.module";
 import { CloudinaryModule } from "@/cloundinary/cloundinary.module";
 import { WebSocketModule } from "./web-socket/chat/web-socket.module";
+import { StreamingModule } from "@/web-socket/streaming/streaming.module";
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { WebSocketModule } from "./web-socket/chat/web-socket.module";
     CloudinaryModule,
 
     WebSocketModule,
+    StreamingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

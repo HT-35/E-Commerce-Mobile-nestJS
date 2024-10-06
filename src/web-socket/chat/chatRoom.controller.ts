@@ -5,7 +5,6 @@ import {
   sendMessageDto,
 } from "@/web-socket/chat/dto/send-nessage.dto";
 import { Controller, Post, Body, Get, Param } from "@nestjs/common";
-import mongoose from "mongoose";
 
 @Controller("chat")
 export class ChatController {

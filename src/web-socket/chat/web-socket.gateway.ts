@@ -35,13 +35,15 @@ export class ChatSocket
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log("Client kết nôi " + client.id);
+    console.log("Client ChatSocket kết nôi " + client.id);
 
-    this.server.to(client.id).emit("isConnect", "Connect Successfull");
+    this.server
+      .to(client.id)
+      .emit("isConnect", "Connect Socket Chat Successfull");
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    //console.log(`Client disconnected: ${client.id}`);
     // Xử lý nếu người dùng ngắt kết nối
     const userId = this.getUserBySocketId(client.id);
     if (userId) {
@@ -86,9 +88,9 @@ export class ChatSocket
   handleJoinRoom(client: Socket, userId: string) {
     client.join(userId);
 
-    console.log(" ");
-    console.log(`Nhân viên đã tham gia vào phòng của userId: ${userId}`);
-    console.log(" ");
+    //console.log(" ");
+    //console.log(`Nhân viên đã tham gia vào phòng của userId: ${userId}`);
+    //console.log(" ");
   }
 
   // Nhân viên gửi tin nhắn phản hồi tới khách hàng
@@ -97,16 +99,33 @@ export class ChatSocket
     client: Socket,
     { userId, message }: { userId: string; message: string },
   ) {
-    console.log("");
-    console.log("");
-    console.log(` >>>  message  userId:`, userId);
-    console.log(` >>>  message admin:`, message);
-    console.log("");
-    console.log("");
+    //console.log("");
+    //console.log("");
+    //console.log(` >>>  message  userId:`, userId);
+    //console.log(` >>>  message admin:`, message);
+    //console.log("");
+    //console.log("");
     // Phát tin nhắn tới người dùng trong phòng có mã userId
     this.server
       .to(userId)
       .emit("UserReceiveMessageByAdmin", { userId, message });
     //this.server.emit("UserReceiveMessageByAdmin", { userId, message });
+  }
+
+  //================================================
+  @SubscribeMessage("join-as-viewer")
+  handleJoinAsViewer(socket: Socket, viewerId: string) {
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log(`Viewer joined with ID: ${viewerId}`);
+    console.log("");
+    console.log("");
+    console.log("");
+    socket.join("viewers");
+    //this.server.to("streamers").emit("viewer-connected", viewerId);
+    this.server
+      .to("66ef660e691c3d84d50dcaee")
+      .emit("viewer-connected", viewerId);
   }
 }
