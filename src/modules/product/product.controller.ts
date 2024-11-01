@@ -10,7 +10,6 @@ import {
   Query,
   BadGatewayException,
   UseInterceptors,
-  UploadedFile,
   BadRequestException,
   UploadedFiles,
 } from "@nestjs/common";
@@ -21,8 +20,7 @@ import { ResponseMessage, Roles, Roles_Type } from "@/public/DecoratorCustom";
 import { CommentDTO } from "@/modules/product/dto/CommentDTO.dto";
 import { ReplyCommentDTO } from "@/modules/product/dto/RepCommentDTO.dto";
 import { ProductModelService } from "@/modules/product/product.service";
-import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
-import { refCount } from "rxjs";
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller("product")
 export class ProductModelController {

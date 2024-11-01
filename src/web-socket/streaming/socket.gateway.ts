@@ -18,6 +18,7 @@ export class StreamingGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
+  private activeUsers: string[] = []; // Lưu userId và socketId của người dùng
 
   handleConnection(client: Socket, ...args: any[]) {
     console.log("Client StreamingGateway kết nôi  " + client.id);
@@ -33,93 +34,99 @@ export class StreamingGateway
     this.server.emit("streamer-disconnected", socket.id);
   }
 
-  //@SubscribeMessage("join-as-streamer")
-  //handleJoinAsStreamer(socket: Socket, streamerId: string) {
-  //  console.log(`Streamer joined with ID: ${streamerId}`);
-  //  socket.join("streamers");
-  //  this.server.to("viewers").emit("streamer-joined", streamerId);
-  //}
-
-  //@SubscribeMessage("join-as-viewer")
-  //handleJoinAsViewer(socket: Socket, viewerId: string) {
-  //  console.log("");
-  //  console.log("");
-  //  console.log("");
-  //  console.log(`Viewer joined with ID: ${viewerId}`);
-  //  console.log("");
-  //  console.log("");
-  //  console.log("");
-  //  socket.join("viewers");
-  //  this.server.to("streamers").emit("viewer-connected", viewerId);
-  //}
-
-  //@SubscribeMessage("disconnect-as-streamer")
-  //handleStreamerDisconnect(socket: Socket, streamerId: string) {
-  //  console.log(`Streamer disconnected: ${streamerId}`);
-  //  socket.leave("streamers");
-  //  this.server.to("viewers").emit("streamer-disconnected", streamerId);
-  //}
-
-  //@SubscribeMessage("viewer-connected")
-  //handleViewerConnected(socket: Socket, viewerId: string) {
-  //  console.log(`Viewer connected: ${viewerId}`);
-  //  this.server.to("streamers").emit("viewer-connected", viewerId);
-  //}
-
   @SubscribeMessage("admin-Conect")
   handleAdminConnect(socket: Socket, viewerId: string) {
-    console.log("");
-    console.log("");
-    console.log("viewerId:  ", viewerId);
-    console.log("");
-    console.log("");
-    console.log("");
+    //console.log("");
+    //console.log("");
+    //console.log("viewerId:  ", viewerId);
+    //console.log("");
+    //console.log("");
+    //console.log("");
   }
 
   @SubscribeMessage("client-join-stream")
-  handleClientJoinStream(socket: Socket, viewerId: string) {
+  handleClientJoinStream(socket: Socket, viewerId: any) {
     console.log("");
     console.log("");
     console.log("client-join-stream:  ", viewerId);
     console.log("");
     console.log("");
     console.log("");
+
+    if (this.activeUsers.includes(viewerId.viewerId) === false) {
+      this.activeUsers.push(viewerId.viewerId);
+    }
+
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log("this.activeUsers", this.activeUsers);
+    console.log("");
+    console.log("");
+
     this.server.emit("Admin-reciever-client", viewerId);
+    this.server.emit("count-connect-stream", this.activeUsers.length);
+  }
+
+  @SubscribeMessage("client-leave-stream")
+  handleClientDelete(socket: Socket, viewerId: any) {
+    //console.log("");
+    //console.log("client-leave-stream:  ", viewerId);
+    //console.log("");
+
+    const index = this.activeUsers.indexOf(viewerId.viewerId);
+
+    if (index !== -1) {
+      // Xóa viewerId khỏi danh sách activeUsers
+      this.activeUsers.splice(index, 1);
+      //console.log(`Đã xóa viewerId: ${viewerId.viewerId}`);
+    } else {
+      //console.log(
+      //  `Không tìm thấy viewerId: ${viewerId.viewerId} trong danh sách activeUsers`,
+      //);
+    }
+
+    console.log("this.activeUsers:", this.activeUsers);
+    console.log("");
+
+    // Bạn có thể phát sự kiện nếu cần thiết
+    // this.server.emit("Admin-reciever-client", viewerId);
+    this.server.emit("count-connect-stream", this.activeUsers.length);
+  }
+
+  @SubscribeMessage("employee-unload")
+  handleEmployeeUnLoad(socket: Socket, data: any) {
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log("end-live", data);
+    console.log("");
+    console.log("");
+
+    this.server.emit("end-livestream");
+  }
+
+  @SubscribeMessage("count-connect")
+  handleCountConnect(socket: Socket) {
+    this.server.emit("count-connect-stream", this.activeUsers.length);
+  }
+
+  @SubscribeMessage("client-chat")
+  handleClientChat(
+    socket: Socket,
+    { message, name, role }: { message: any; name: string; role: string },
+  ) {
+    console.log("");
+    console.log("");
+    console.log(">> messageChat : ", message);
+    console.log(">>> viewerId", name);
+    console.log(">> role:", role);
+    console.log("");
+
+    socket.broadcast.emit("chat-all", { message, name, role });
   }
 
   afterInit(server: Server) {
     console.log("Khởi tạo thành công websocket streaming");
   }
 }
-
-//import {
-//  SubscribeMessage,
-//  WebSocketGateway,
-//  WebSocketServer,
-//} from "@nestjs/websockets";
-//import { Server } from "socket.io";
-
-//@WebSocketGateway(5001, {
-//  cors: {
-//    origin: "*", // Cho phép tất cả các nguồn gốc
-//  },
-//})
-//export class StreamingGateway {
-//  @WebSocketServer() server: Server;
-
-//  @SubscribeMessage("callUser")
-//  handleCallUser(client: any, payload: any): void {
-//    // Lắng nghe và xử lý sự kiện gọi người dùng khác
-//    const { targetUserId, signalData, from } = payload;
-//    this.server
-//      .to(targetUserId)
-//      .emit("incomingCall", { signal: signalData, from });
-//  }
-
-//  @SubscribeMessage("answerCall")
-//  handleAnswerCall(client: any, payload: any): void {
-//    // Xử lý khi người dùng trả lời cuộc gọi
-//    const { to, signal } = payload;
-//    this.server.to(to).emit("callAnswered", signal);
-//  }
-//}

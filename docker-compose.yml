@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  nestjs-app:
+    container_name: nestjs-server
+    image: node:22-alpine # Bạn có thể thay thế bằng phiên bản Node.js mà bạn cần
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app # Gắn kết thư mục hiện tại với thư mục trong container
+      - /usr/src/app/node_modules # Đảm bảo không ghi đè thư mục node_modules
+    ports:
+      - "3000:3000" # Map cổng 3000 của container với cổng 3000 trên máy chủ
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - db # NestJS sẽ khởi chạy sau khi MongoDB khởi động xong
+
+volumes:
+  mongo-data:
+    driver: local

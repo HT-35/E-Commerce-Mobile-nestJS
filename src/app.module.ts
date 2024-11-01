@@ -13,6 +13,7 @@ import { FileModule } from "./modules/file/file.module";
 import { CloudinaryModule } from "@/cloundinary/cloundinary.module";
 import { WebSocketModule } from "./web-socket/chat/web-socket.module";
 import { StreamingModule } from "@/web-socket/streaming/streaming.module";
+import { PaymentModule } from "./modules/payment/payment.module";
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { StreamingModule } from "@/web-socket/streaming/streaming.module";
 
     WebSocketModule,
     StreamingModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

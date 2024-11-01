@@ -4,7 +4,7 @@ import {
 } from "@/web-socket/chat/entities/chatRoom.schema";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model } from "mongoose";
+import { Model } from "mongoose";
 
 @Injectable()
 export class chatService {

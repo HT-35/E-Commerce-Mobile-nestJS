@@ -16,6 +16,8 @@ import { ResponseMessage } from "@/public/DecoratorCustom";
 import mongoose from "mongoose";
 import { CreateEmployeeDto } from "@/modules/user/dto/CreateEmployeeDto";
 import { ProductToCartDto } from "@/modules/user/dto/addProductToCart.dto";
+import { addressDto } from "@/modules/user/dto/address.dto";
+import { updateAddressDto } from "@/modules/user/dto/updateAddress.dto";
 
 @Controller("user")
 export class UserController {
@@ -100,10 +102,58 @@ export class UserController {
 
   @Delete("/cart/delete/:slug")
   @ResponseMessage("Delete Product to Cart")
-  deleteProductQuanlityInCart(@Param("slug") slug: string, @Req() req: any) {
+  deleteProductQuanlityInCart(
+    @Param("slug") slug: string,
+    @Query("color") color: string,
+    @Req() req: any,
+  ) {
     const { _id } = req.user;
 
-    return this.userService.deleteProductQuanlityInCart(slug, _id);
+    return this.userService.deleteProductQuanlityInCart({ slug, color, _id });
+  }
+
+  // ===============address ================
+
+  @Post("/address")
+  @ResponseMessage("Create Address Shipping")
+  addAddress(@Body() address: addressDto, @Req() req: any) {
+    const _id = req.user._id;
+
+    return this.userService.addAddress({ address, _id });
+  }
+
+  @Get("/address")
+  @ResponseMessage("Get Address Shipping")
+  getAddressDetail(@Req() req: any) {
+    const { _id } = req.user;
+    return this.userService.findAddress({ _id });
+  }
+
+  @Patch("/address/:id")
+  @ResponseMessage("Update  Address Shipping")
+  updateAddress(
+    @Body() address: updateAddressDto,
+    @Req() req: any,
+    @Param("id") id: string,
+  ) {
+    const addressId = id;
+    const _id = req.user._id;
+    return this.userService.updateAddress({ address, _id, addressId });
+  }
+
+  @Delete("/address/:id")
+  @ResponseMessage("Delete  Address Shipping")
+  deleteAddress(@Req() req: any, @Param("id") id: string) {
+    const addressId = id;
+    const _id = req.user._id;
+    return this.userService.deleteAddress({ _id, addressId });
+  }
+
+  // ================================    Bill     ===============================
+  @Post("/bill")
+  @ResponseMessage("Create Bill")
+  createBill(@Body() data: any, @Req() req: any) {
+    return;
   }
 
   // ===============================  find user by id  ==================================

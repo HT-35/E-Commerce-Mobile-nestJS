@@ -19,6 +19,8 @@ import { NewPasswordDto } from "@/auth/dto/NewPasswordDto.dto";
 import aqp from "api-query-params";
 import { CreateEmployeeDto } from "@/modules/user/dto/CreateEmployeeDto";
 import { Product } from "@/modules/product/schema/product-model.schema";
+import { addressDto } from "@/modules/user/dto/address.dto";
+import { updateAddressDto } from "@/modules/user/dto/updateAddress.dto";
 
 @Injectable()
 export class UserService {
@@ -410,50 +412,133 @@ export class UserService {
     }
   }
 
+  //async addProductInCart(data: cartItem, _id: mongoose.Types.ObjectId) {
+  //  console.log(`data:`, data);
+  //  try {
+  //    const user = await this.findOne(_id);
+  //    if (!user) {
+  //      throw new BadGatewayException("Not Found User !");
+  //    }
+  //    let newCart: cartItem[];
+  //    if (user.cart.length === 0) {
+  //      newCart = [
+  //        { quantity: data.quantity, color: data.color, slug: data.slug },
+  //      ];
+  //    } else {
+  //      // tìm xem sp có trong cart hay không
+  //      const checkProduct = user.cart.some((item) => {
+  //        if (item.slug === data.slug) {
+  //          console.log(`item:`, item);
+  //          return true;
+  //        } else {
+  //          return false;
+  //        }
+  //      });
+  //      //TH đã có sản phẩm trong cart, update quantity
+  //      if (checkProduct) {
+  //        user.cart.forEach((item, index) => {
+  //          // trường hợp đã có sản phẩm và có cùng màu thì update quantity
+  //          if (item.slug === data.slug && item.color === data.color) {
+  //            console.log("");
+  //            console.log("");
+  //            console.log("");
+  //            console.log("check 1");
+  //            console.log(
+  //              " trường hợp đã có sản phẩm và có cùng màu thì update quantity",
+  //            );
+  //            console.log("");
+  //            console.log("");
+  //            console.log("");
+  //            newCart = [
+  //              ...user.cart,
+  //              {
+  //                quantity: Number(Number(data.quantity) + Number(item.quantity)),
+  //                slug: data.slug,
+  //                color: data.color,
+  //              },
+  //            ];
+  //            delete newCart[index];
+  //          } else {
+  //            // trường hợp đã có sản phẩm và nhưng không cùng màu thì thêm mới sản phẩm và màu mới vào cart
+  //            console.log("");
+  //            console.log("");
+  //            console.log("");
+  //            console.log("check 2");
+  //            console.log(
+  //              "// trường hợp đã có sản phẩm và nhưng không cùng màu thì thêm mới sản phẩm và màu mới vào cart",
+  //            );
+  //            console.log("");
+  //            console.log("");
+  //            console.log("");
+  //            newCart = [
+  //              ...user.cart,
+  //              { quantity: data.quantity, slug: data.slug, color: data.color },
+  //            ];
+  //          }
+  //        });
+  //      } else {
+  //        //TH chưa có sản phẩm trong cart
+  //        newCart = [
+  //          ...user.cart,
+  //          { quantity: data.quantity, slug: data.slug, color: data.color },
+  //        ];
+  //      }
+  //      console.log(`checkProduct:`, checkProduct);
+  //    }
+
+  //    //console.log(`newCart:`, newCart);
+
+  //    user.cart = newCart;
+  //    await user.save();
+  //    await this.UserModel.syncIndexes();
+  //    return await this.UserModel.findOne({ _id }).populate({
+  //      path: "cart.slug", // Đi đến slug trong cart
+  //      model: Product.name, // Model Product
+  //      localField: "cart.slug", // Trường trong model User (cart.slug)
+  //      foreignField: "slug", // Trường trong model Product
+  //    });
+  //  } catch (error) {
+  //    throw new BadRequestException(error);
+  //  }
+  //}
+
   async addProductInCart(data: cartItem, _id: mongoose.Types.ObjectId) {
     try {
       const user = await this.findOne(_id);
       if (!user) {
         throw new BadGatewayException("Not Found User !");
       }
-      let newCart: cartItem[];
-      if (user.cart.length === 0) {
-        newCart = [{ quatity: data.quatity, slug: data.slug }];
+
+      const newCart: cartItem[] = [...user.cart]; // Clone the current cart
+      const existingProductIndex = newCart.findIndex(
+        (item) => item.slug === data.slug && item.color === data.color,
+      );
+
+      if (existingProductIndex > -1) {
+        // Trường hợp sản phẩm đã tồn tại với cùng màu sắc
+        newCart[existingProductIndex].quantity =
+          Number(newCart[existingProductIndex].quantity) +
+          Number(data.quantity);
       } else {
-        const checkProduct = user.cart.some((item) => {
-          if (item.slug === data.slug) {
-            console.log(`item:`, item);
-            return true;
-          } else {
-            return false;
-          }
+        // Trường hợp sản phẩm chưa tồn tại hoặc khác màu
+
+        newCart.push({
+          quantity: data.quantity,
+          slug: data.slug,
+          color: data.color,
         });
-        if (checkProduct) {
-          user.cart.forEach((item, index) => {
-            if (item.slug === data.slug) {
-              newCart = [
-                ...user.cart,
-                {
-                  quatity: Number(Number(data.quatity) + Number(item.quatity)),
-                  slug: data.slug,
-                },
-              ];
-              delete newCart[index];
-              //console.log(`newCart:`, newCart);
-            }
-          });
-        } else {
-          newCart = [...user.cart, { quatity: data.quatity, slug: data.slug }];
-        }
-        console.log(`checkProduct:`, checkProduct);
       }
 
-      //console.log(`newCart:`, newCart);
-
       user.cart = newCart;
-      const saveCart = await user.save();
-      await this.UserModel.syncIndexes();
-      return saveCart;
+      await user.save();
+      //await this.UserModel.syncIndexes();
+
+      return await this.UserModel.findOne({ _id }).populate({
+        path: "cart.slug", // Đi đến slug trong cart
+        model: Product.name, // Model Product
+        localField: "cart.slug", // Trường trong model User (cart.slug)
+        foreignField: "slug", // Trường trong model Product
+      });
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -467,74 +552,193 @@ export class UserService {
     if (!user) {
       throw new BadGatewayException("Not Found User !");
     }
-    let newCart: cartItem[];
+    const newCart: cartItem[] = [...user.cart];
     if (user.cart.length === 0) {
       throw new BadRequestException("Nothing Product In Cart");
     }
 
-    user.cart.forEach((item, index) => {
-      if (item.slug === data.slug) {
-        console.log(`item:`, item.quatity);
-        console.log(`data:`, data.quatity);
-        //if (item.quatity === 1) {
-        //  throw new BadRequestException("Quanlity Product Min : 1");
-        //}
+    const findProduct = newCart.findIndex(
+      (item) => item.slug === data.slug && item.color === data.color,
+    );
 
-        const calcQuantity =
-          Number(Number(item.quatity) - Number(data.quatity)) <= 1
-            ? 1
-            : Number(Number(item.quatity) - Number(data.quatity));
+    if (findProduct > -1) {
+      const count =
+        Number(newCart[findProduct].quantity) - Number(data.quantity) > 0
+          ? Number(newCart[findProduct].quantity) - Number(data.quantity)
+          : 1;
 
-        newCart = [
-          ...user.cart,
-          {
-            quatity: calcQuantity,
-            slug: data.slug,
-          },
-        ];
-        delete newCart[index];
-      }
-    });
+      newCart[findProduct].quantity = count;
+    }
     try {
       user.cart = newCart;
-      const saveCart = await user.save();
-      await this.UserModel.syncIndexes();
-      return saveCart;
+      await user.save();
+      //await this.UserModel.syncIndexes();
+      return await this.UserModel.findOne({ _id }).populate({
+        path: "cart.slug", // Đi đến slug trong cart
+        model: Product.name, // Model Product
+        localField: "cart.slug", // Trường trong model User (cart.slug)
+        foreignField: "slug", // Trường trong model Product
+      });
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async deleteProductQuanlityInCart(
-    slug: string,
-    _id: mongoose.Types.ObjectId,
-  ) {
+  async deleteProductQuanlityInCart({
+    slug,
+    color,
+    _id,
+  }: {
+    slug: string;
+    color: string;
+    _id: mongoose.Types.ObjectId;
+  }) {
     console.log(`slug:`, slug);
+
+    const user = await this.findOne(_id);
+
+    if (!user) {
+      throw new BadRequestException("Not Found User !");
+    }
+    if (user.cart.length === 0) {
+      throw new BadRequestException("Cart is empty");
+    }
+
+    const checkProduct = await user.cart.some((item) => {
+      if (item.slug === slug && item.color === color) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    if (!checkProduct) {
+      throw new BadRequestException("Not Found Product In Cart");
+    }
+    let newCart: cartItem[];
+    user.cart.forEach(async (item, index) => {
+      console.log("item.slug ", item.slug);
+      console.log("slug", slug);
+      console.log("");
+      console.log("");
+      console.log("item.color", item.color);
+      console.log("color", color);
+      if (item.slug === slug && item.color === color) {
+        newCart = [...user.cart];
+        delete newCart[index];
+
+        user.cart = newCart;
+        await user.save();
+        await this.UserModel.syncIndexes();
+      }
+    });
+    return await this.getAllProductInCart(_id);
+  }
+
+  // ===============  add  Address
+
+  async addAddress({ address, _id }: { address: addressDto; _id: string }) {
     try {
-      const user = await this.findOne(_id);
+      const user = await this.findOne(new mongoose.Types.ObjectId(_id));
 
       if (!user) {
-        throw new BadRequestException("Not Found User !");
-      }
-      if (user.cart.length === 0) {
-        return "Cart is empty";
+        throw new BadRequestException("Không tìm thấy user!");
       }
 
-      let newCart: cartItem[];
-      user.cart.forEach((item, index) => {
-        if (item.slug === slug) {
-          newCart = [...user.cart];
-          delete newCart[index];
-        }
-      });
+      const checkDuplicate = await user.address.some(
+        (item) => item.address_detail === address.address_detail,
+      );
 
-      user.cart = newCart;
-      await user.save();
-      await this.UserModel.syncIndexes();
+      if (checkDuplicate) {
+        throw new BadRequestException("Địa chỉ giao hàng cụ thể đã tồn tại !");
+      }
+      console.log(checkDuplicate);
 
-      return await this.getAllProductInCart(_id);
+      user.address.push(address);
+      const newUser = await user.save();
+      //this.UserModel.syncIndexes();
+      return newUser;
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
+  }
+
+  async findAddress({ _id }: { _id: string }) {
+    const user = await this.findOne(new mongoose.Types.ObjectId(_id));
+
+    if (!user) throw new BadRequestException("Not Found User !");
+
+    return user.address;
+  }
+
+  async updateAddress({
+    address,
+    _id,
+    addressId,
+  }: {
+    address: updateAddressDto;
+    _id: string;
+    addressId: string;
+  }) {
+    const user = await this.findOne(new mongoose.Types.ObjectId(_id));
+
+    if (!user) throw new BadRequestException("Not Found User !");
+
+    const checkDuplicate = user.address.some(
+      (item) => item.address_detail === address.address_detail,
+    );
+
+    if (checkDuplicate) {
+      throw new BadRequestException("Địa chỉ giao hàng cụ thể đã tồn tại !");
+    }
+    const updateCart = await this.UserModel.findOneAndUpdate(
+      {
+        _id: new mongoose.Types.ObjectId(_id),
+        "address._id": new mongoose.Types.ObjectId(addressId),
+      },
+      {
+        $set: {
+          "address.$.province_id": address.province_id,
+          "address.$.district_id": address.district_id,
+          "address.$.ward_code": address.ward_code,
+          "address.$.address_detail": address.address_detail,
+          "address.$.updatedAt": new Date(),
+        },
+      },
+    );
+
+    if (!updateCart) {
+      throw new BadRequestException(updateCart);
+    }
+
+    console.log("");
+    console.log("");
+    console.log("");
+    console.log(updateCart);
+    console.log("");
+    console.log("");
+    //console.log("");
+
+    return await this.findOne(new mongoose.Types.ObjectId(_id));
+  }
+
+  async deleteAddress({ _id, addressId }: { _id: string; addressId: string }) {
+    const user = await this.findOne(new mongoose.Types.ObjectId(_id));
+
+    if (!user) throw new BadRequestException("Not Found User");
+
+    const findIndexAddress = user.address.findIndex((item: any) => {
+      return item._id.toString() === addressId;
+    });
+
+    if (findIndexAddress === -1) {
+      throw new BadRequestException("Not Found Address");
+    }
+
+    user.address.splice(findIndexAddress, 1);
+
+    const newUser = user.save();
+
+    return newUser;
   }
 }
