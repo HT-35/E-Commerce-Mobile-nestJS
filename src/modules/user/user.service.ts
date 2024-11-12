@@ -1,3 +1,4 @@
+import { map } from "rxjs";
 import {
   BadGatewayException,
   BadRequestException,
@@ -7,7 +8,12 @@ import {
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectModel } from "@nestjs/mongoose";
-import { cartItem, User } from "@/modules/user/schema/user.schema";
+import {
+  Bill,
+  cartItem,
+  itemBill,
+  User,
+} from "@/modules/user/schema/user.schema";
 import mongoose, { Model } from "mongoose";
 
 import { v4 as uuidv4 } from "uuid";
@@ -21,12 +27,18 @@ import { CreateEmployeeDto } from "@/modules/user/dto/CreateEmployeeDto";
 import { Product } from "@/modules/product/schema/product-model.schema";
 import { addressDto } from "@/modules/user/dto/address.dto";
 import { updateAddressDto } from "@/modules/user/dto/updateAddress.dto";
+import { CreateBillDto } from "@/modules/user/dto/create-bill.dto";
+import axios from "axios";
+import { ProductModelService } from "@/modules/product/product.service";
+
+//const keyGHN = process.env.key_GHN;
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private UserModel: Model<User>,
     private mailerServive: MailerService,
+    private productServer: ProductModelService,
   ) {}
 
   sendCodeIdToEmail = async (result: any, IdCode: string) => {
@@ -412,96 +424,6 @@ export class UserService {
     }
   }
 
-  //async addProductInCart(data: cartItem, _id: mongoose.Types.ObjectId) {
-  //  console.log(`data:`, data);
-  //  try {
-  //    const user = await this.findOne(_id);
-  //    if (!user) {
-  //      throw new BadGatewayException("Not Found User !");
-  //    }
-  //    let newCart: cartItem[];
-  //    if (user.cart.length === 0) {
-  //      newCart = [
-  //        { quantity: data.quantity, color: data.color, slug: data.slug },
-  //      ];
-  //    } else {
-  //      // tìm xem sp có trong cart hay không
-  //      const checkProduct = user.cart.some((item) => {
-  //        if (item.slug === data.slug) {
-  //          console.log(`item:`, item);
-  //          return true;
-  //        } else {
-  //          return false;
-  //        }
-  //      });
-  //      //TH đã có sản phẩm trong cart, update quantity
-  //      if (checkProduct) {
-  //        user.cart.forEach((item, index) => {
-  //          // trường hợp đã có sản phẩm và có cùng màu thì update quantity
-  //          if (item.slug === data.slug && item.color === data.color) {
-  //            console.log("");
-  //            console.log("");
-  //            console.log("");
-  //            console.log("check 1");
-  //            console.log(
-  //              " trường hợp đã có sản phẩm và có cùng màu thì update quantity",
-  //            );
-  //            console.log("");
-  //            console.log("");
-  //            console.log("");
-  //            newCart = [
-  //              ...user.cart,
-  //              {
-  //                quantity: Number(Number(data.quantity) + Number(item.quantity)),
-  //                slug: data.slug,
-  //                color: data.color,
-  //              },
-  //            ];
-  //            delete newCart[index];
-  //          } else {
-  //            // trường hợp đã có sản phẩm và nhưng không cùng màu thì thêm mới sản phẩm và màu mới vào cart
-  //            console.log("");
-  //            console.log("");
-  //            console.log("");
-  //            console.log("check 2");
-  //            console.log(
-  //              "// trường hợp đã có sản phẩm và nhưng không cùng màu thì thêm mới sản phẩm và màu mới vào cart",
-  //            );
-  //            console.log("");
-  //            console.log("");
-  //            console.log("");
-  //            newCart = [
-  //              ...user.cart,
-  //              { quantity: data.quantity, slug: data.slug, color: data.color },
-  //            ];
-  //          }
-  //        });
-  //      } else {
-  //        //TH chưa có sản phẩm trong cart
-  //        newCart = [
-  //          ...user.cart,
-  //          { quantity: data.quantity, slug: data.slug, color: data.color },
-  //        ];
-  //      }
-  //      console.log(`checkProduct:`, checkProduct);
-  //    }
-
-  //    //console.log(`newCart:`, newCart);
-
-  //    user.cart = newCart;
-  //    await user.save();
-  //    await this.UserModel.syncIndexes();
-  //    return await this.UserModel.findOne({ _id }).populate({
-  //      path: "cart.slug", // Đi đến slug trong cart
-  //      model: Product.name, // Model Product
-  //      localField: "cart.slug", // Trường trong model User (cart.slug)
-  //      foreignField: "slug", // Trường trong model Product
-  //    });
-  //  } catch (error) {
-  //    throw new BadRequestException(error);
-  //  }
-  //}
-
   async addProductInCart(data: cartItem, _id: mongoose.Types.ObjectId) {
     try {
       const user = await this.findOne(_id);
@@ -740,5 +662,161 @@ export class UserService {
     const newUser = user.save();
 
     return newUser;
+  }
+
+  async createBill({
+    _id,
+    createBillDto,
+  }: {
+    _id: string;
+    createBillDto: CreateBillDto;
+  }) {
+    try {
+      const user = await this.findOne(new mongoose.Types.ObjectId(_id));
+      if (!user) {
+        throw new BadRequestException("Not Found User !");
+      }
+
+      const itemBill: itemBill[] = await Promise.all(
+        createBillDto.item.map(async (item) => {
+          const product = await this.productServer.findOne(item.slug);
+          if (!product) {
+            throw new BadRequestException("Not Found Product");
+          }
+          const indexOption = await product.option.findIndex(
+            (item) => item.color === item.color,
+          );
+          if (indexOption === -1) {
+            throw new BadRequestException("Not Found Color Product");
+          }
+          const price = await product.option[indexOption].price;
+          const calc = Number(price) * Number(item.quantity);
+
+          return {
+            price,
+            slug: item.slug,
+            color: item.color,
+            name: product.name,
+            brand: product.brand,
+            calcPrice: calc,
+            quantity: item.quantity,
+          };
+        }),
+      );
+
+      const total = itemBill.reduce((a, b) => {
+        return Number(a) + Number(b.calcPrice);
+      }, 0);
+
+      const contentOrderShiping = itemBill.map((item) => {
+        return {
+          name: `${item.name}`,
+          code: `${item.brand}`,
+          quantity: Number(item.quantity),
+          price: +item.price,
+          length: 16,
+          width: 7,
+          height: 1,
+          weight: 50,
+          category: {
+            level1: `${item.name}`,
+          },
+        };
+      });
+
+      const indexAddressShiping = user.address.findIndex(
+        (item) => item.address_detail === createBillDto.addressShiping,
+      );
+      if (indexAddressShiping === -1) {
+        throw new BadRequestException("Không tìm thấy địa chỉ giao hàng");
+      }
+
+      // tạo đợn hàng GHN
+      const orderData = {
+        payment_type_id: 1,
+        note: "Gọi điện trước khi giao hàng",
+        required_note: "CHOTHUHANG",
+        from_name: "Huy Trần",
+        from_phone: "0343128733",
+        from_address:
+          "tạp hóa quỳnh trang, tổ 38, khu phố vườn dừa, phường phước tân, thành phố biên hòa, tỉnh đồng nai",
+        from_ward_name: "Xã Phước Tân",
+        from_district_name: "Thành phố Biên Hòa",
+        from_province_name: "Đồng Nai",
+        return_phone: "0343128733",
+        return_address:
+          "tạp hóa quỳnh trang, tổ 38, khu phố vườn dừa, phường phước tân, thành phố biên hòa, tỉnh đồng nai",
+        return_district_id: 1536,
+        return_ward_code: "480128",
+        client_order_code: "",
+
+        to_name: `${user.name}`,
+        to_phone: `${createBillDto.numberPhone}`,
+        to_address: `${user.address[indexAddressShiping].address_detail}`,
+        to_ward_code: `${user.address[indexAddressShiping].ward_code}`,
+        to_district_id: Number(user.address[indexAddressShiping].district_id),
+        cod_amount: total,
+        content: "Test chức năng giao hàng của website bán điện thoại",
+        weight: 50,
+        length: 16,
+        width: 7,
+        height: 1,
+        pick_station_id: 10,
+        deliver_station_id: null,
+        insurance_value: 5000000,
+        service_id: 0,
+        service_type_id: 2,
+        coupon: null,
+        pick_shift: [2],
+        items: [...contentOrderShiping],
+      };
+
+      const createShippingGHN = await axios.post(
+        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+        orderData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Token: `0e987591-4e75-11ef-8e53-0a00184fe694`,
+          },
+        },
+      );
+      //console.log(createShippingGHN.data.data.order_code);
+
+      const newBill: Bill = {
+        itemArr: itemBill,
+        email: createBillDto.email,
+        numberPhone: createBillDto.numberPhone,
+        status: "pending",
+        CodeShipGHN: await createShippingGHN.data.data.order_code,
+        total,
+        addressShiping: createBillDto.addressShiping,
+      };
+      console.log("");
+      console.log("");
+      console.log("");
+      console.log("newBill", newBill);
+      console.log("");
+      console.log("");
+
+      //await user.Bill.push(newBill);
+
+      //const newArr = [...user.Bill, newBill];
+      //user.Bill = newArr;
+      user.Bill.push(newBill);
+      const saveUser = await user.save();
+
+      return saveUser;
+    } catch (error) {
+      console.log("");
+      console.log("");
+      console.log("");
+      console.log(error);
+      console.log("");
+      console.log("");
+      console.log("");
+
+      throw new BadRequestException(error.message);
+    }
   }
 }

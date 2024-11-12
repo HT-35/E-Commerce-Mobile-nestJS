@@ -5,6 +5,14 @@ import mongoose, { HydratedDocument } from "mongoose";
 
 export type UserDocument = HydratedDocument<User>;
 
+//enum statusShiping {
+//  pending = "pending",
+//  paid = "paid",
+//  shipped = "shipped",
+//  completed = "completed",
+//  canceled = "canceled",
+//}
+
 @Schema({ timestamps: true })
 export class cartItem {
   @Prop({
@@ -65,19 +73,51 @@ export class itemBill {
   quantity: number;
 
   @Prop({
-    type: Number,
+    type: String,
     required: true,
   })
-  price: number;
+  price: string;
+  @Prop({
+    type: String,
+  })
+  name: string;
+  @Prop({
+    type: String,
+  })
+  brand: string;
+  @Prop({
+    type: Number,
+  })
+  calcPrice: number;
 }
 
 @Schema({ timestamps: true })
 export class Bill {
   @Prop({
     type: [itemBill],
-    default: [],
   })
   itemArr: itemBill[];
+
+  @Prop({
+    type: String,
+  })
+  email: string;
+
+  @Prop({
+    type: String,
+  })
+  numberPhone: string;
+
+  @Prop({
+    type: String,
+  })
+  CodeShipGHN: string;
+
+  @Prop({
+    enum: ["pending", "paid", "shipped", "completed", "canceled"],
+    default: "pending",
+  })
+  status: "pending" | "paid" | "shipped" | "completed" | "canceled";
 
   @Prop({
     type: Number,
@@ -86,10 +126,10 @@ export class Bill {
   total: number;
 
   @Prop({
-    type: mongoose.Types.ObjectId,
+    type: String,
     required: true,
   })
-  addressShiping: mongoose.Types.ObjectId;
+  addressShiping: string;
 }
 
 @Schema({ timestamps: true })
@@ -127,7 +167,6 @@ export class User {
   @Prop({
     type: [Bill],
     unique: true,
-    default: [],
   })
   Bill: Bill[];
 

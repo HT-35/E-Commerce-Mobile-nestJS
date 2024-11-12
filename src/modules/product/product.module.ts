@@ -15,5 +15,6 @@ import { CloudinaryModule } from "@/cloundinary/cloundinary.module";
   ],
   controllers: [ProductModelController],
   providers: [ProductModelService],
+  exports: [ProductModelService],
 })
 export class ProductModule {}

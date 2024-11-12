@@ -18,6 +18,7 @@ import { CreateEmployeeDto } from "@/modules/user/dto/CreateEmployeeDto";
 import { ProductToCartDto } from "@/modules/user/dto/addProductToCart.dto";
 import { addressDto } from "@/modules/user/dto/address.dto";
 import { updateAddressDto } from "@/modules/user/dto/updateAddress.dto";
+import { CreateBillDto } from "@/modules/user/dto/create-bill.dto";
 
 @Controller("user")
 export class UserController {
@@ -152,8 +153,9 @@ export class UserController {
   // ================================    Bill     ===============================
   @Post("/bill")
   @ResponseMessage("Create Bill")
-  createBill(@Body() data: any, @Req() req: any) {
-    return;
+  createBill(@Body() createBillDto: CreateBillDto, @Req() req: any) {
+    const { _id } = req.user;
+    return this.userService.createBill({ _id, createBillDto });
   }
 
   // ===============================  find user by id  ==================================

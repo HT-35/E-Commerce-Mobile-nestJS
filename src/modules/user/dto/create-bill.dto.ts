@@ -1,13 +1,11 @@
 import { Type } from "class-transformer";
 import {
   IsArray,
-  IsMongoId,
   IsNotEmpty,
   IsNumber,
   IsString,
   ValidateNested,
 } from "class-validator";
-import mongoose from "mongoose";
 
 class itemArr {
   @IsString()
@@ -21,10 +19,6 @@ class itemArr {
   @IsNumber()
   @IsNotEmpty()
   quantity: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  price: number;
 }
 
 export class CreateBillDto {
@@ -33,11 +27,15 @@ export class CreateBillDto {
   @Type(() => itemArr)
   item: itemArr[];
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  total: number;
+  email: string;
 
-  @IsMongoId()
+  @IsString()
   @IsNotEmpty()
-  addressShiping: mongoose.Types.ObjectId;
+  numberPhone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  addressShiping: string;
 }
