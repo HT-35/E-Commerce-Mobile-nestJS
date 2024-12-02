@@ -1,17 +1,9 @@
 import { Product } from "@/modules/product/schema/product-model.schema";
 import { Roles_Type } from "@/public/DecoratorCustom";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type UserDocument = HydratedDocument<User>;
-
-//enum statusShiping {
-//  pending = "pending",
-//  paid = "paid",
-//  shipped = "shipped",
-//  completed = "completed",
-//  canceled = "canceled",
-//}
 
 @Schema({ timestamps: true })
 export class cartItem {
@@ -150,10 +142,10 @@ export class User {
   address: AddressDelivery[];
 
   @Prop()
-  phone: string;
+  numberPhone: string;
 
   @Prop({ default: Roles_Type.USER })
-  roles: Roles_Type;
+  role: Roles_Type;
 
   // ======================    Cart  =================================
   @Prop({

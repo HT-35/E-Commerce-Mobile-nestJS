@@ -6,6 +6,7 @@ import {
   IsMongoId,
   ValidateNested,
   IsOptional,
+  IsEmpty,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -119,15 +120,17 @@ export class CreateProductDto {
   @Type(() => OptionDTO)
   option: OptionDTO[];
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ReviewProductDTO)
-  reviews: ReviewProductDTO[];
+  //@IsEmpty()
+  //@IsArray()
+  //@ValidateNested({ each: true })
+  //@Type(() => ReviewProductDTO)
+  //reviews: ReviewProductDTO[];
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CommentProductDTO)
-  comments: CommentProductDTO[];
+  //@IsEmpty()
+  //@IsArray()
+  //@ValidateNested({ each: true })
+  //@Type(() => CommentProductDTO)
+  //comments: CommentProductDTO[];
 
   @IsOptional() // Đây là trường duy nhất không bắt buộc
   @IsString()

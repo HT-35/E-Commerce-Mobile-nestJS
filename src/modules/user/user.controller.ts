@@ -82,7 +82,6 @@ export class UserController {
   @ResponseMessage("Get Product to Cart")
   getAllProductInCart(@Req() req: any) {
     const { _id } = req.user;
-
     return this.userService.getAllProductInCart(_id);
   }
 

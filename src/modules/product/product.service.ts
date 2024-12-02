@@ -10,6 +10,7 @@ import { CommentDTO } from "@/modules/product/dto/CommentDTO.dto";
 import { ReplyCommentDTO } from "@/modules/product/dto/RepCommentDTO.dto";
 import { CloudinaryService } from "@/cloundinary/cloundinary.service";
 import { TypeFolderClouldinary } from "@/utils/constants";
+import slugify from "slugify";
 
 @Injectable()
 export class ProductModelService {
@@ -18,16 +19,39 @@ export class ProductModelService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
+  // Hàm loại bỏ dấu thủ công
+  removeVietnameseTones(str: string): string {
+    return str
+      .normalize("NFD") // Chuẩn hóa ký tự Unicode
+      .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu
+      .replace(/đ/g, "d") // Thay ký tự đ
+      .replace(/Đ/g, "D") // Thay ký tự Đ
+      .trim(); // Loại bỏ khoảng trắng thừa
+  }
+
   async create(CreateProductDto: CreateProductDto) {
     try {
-      const namePhone = CreateProductDto.name.split(" ").join("-");
+      // Loại bỏ khoảng trắng trong ram và rom
+      const ram = CreateProductDto.ram.replace(/\s+/g, ""); // Xóa tất cả khoảng trắng
+      const rom = CreateProductDto.rom.replace(/\s+/g, ""); // Xóa tất cả khoảng trắng
 
-      const slug = `${namePhone}-${CreateProductDto.ram}-${CreateProductDto.rom}`;
+      const namePhone = slugify(
+        this.removeVietnameseTones(CreateProductDto.name),
+        {
+          lower: true,
+          remove: /[*+~.()'"!:@]/g, // Loại bỏ các ký tự đặc biệt
+        },
+      );
+
+      const slug = `${namePhone}-${ram}-${rom}`;
 
       const createProduct = await this.productModel.create({
         ...CreateProductDto,
+        ram, // Gán lại giá trị đã được loại bỏ khoảng trắng
+        rom, // Gán lại giá trị đã được loại bỏ khoảng trắng
         slug,
       });
+
       // Đồng bộ hóa các chỉ mục của mô hình trong cơ sở dữ liệu
       await this.productModel.syncIndexes();
 
@@ -35,7 +59,7 @@ export class ProductModelService {
     } catch (error) {
       if (error.code === 11000) {
         throw new BadRequestException(
-          `sản phẩm  ${error.keyValue.slug} đã tồn tại`,
+          `Sản phẩm ${error.keyValue.slug} đã tồn tại`,
         );
       }
       throw new BadRequestException(error);

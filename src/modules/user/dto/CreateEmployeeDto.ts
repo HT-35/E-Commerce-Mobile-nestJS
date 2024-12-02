@@ -11,15 +11,11 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   name: string;
 
-  @IsString()
   @IsNotEmpty()
-  address: string;
+  @IsString()
+  numberPhone: string;
 
   @IsNotEmpty()
   @IsString()
-  phone: string;
-
-  @IsNotEmpty()
-  @IsString()
-  roles: Roles_Type.ADMIN | Roles_Type.EMPLOYEE;
+  role: Roles_Type.ADMIN | Roles_Type.EMPLOYEE;
 }

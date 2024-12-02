@@ -163,26 +163,20 @@ export class UserService {
         name: createEmployeeDto.name,
         email: createEmployeeDto.email,
         password: 1111, // defaul password
-        address: createEmployeeDto.address,
-        phone: createEmployeeDto.phone,
-        roles: createEmployeeDto.roles,
+        numberPhone: createEmployeeDto.numberPhone,
+        role: createEmployeeDto.role,
         //isActive: true,
       });
 
       // Đồng bộ hóa các chỉ mục của mô hình trong cơ sở dữ liệu
-      await this.UserModel.syncIndexes();
+      //await this.UserModel.syncIndexes();
 
       const result = await this.findOneByEmail(createEmployeeDto.email);
 
       return result;
     } catch (error) {
-      if (error.code === 11000) {
-        throw new BadRequestException(`${error.keyValue.email} đã tồn tại`);
-      }
       throw new BadRequestException(error);
     }
-
-    //return 'This action adds a new user';
   }
 
   async findAll(query: string, current: number, pageSize: number) {
@@ -242,10 +236,13 @@ export class UserService {
     }
 
     try {
-      await this.UserModel.updateOne({ _id: id }, { ...updateUserDto });
+      const updateUser = await this.UserModel.updateOne(
+        { _id: id },
+        { ...updateUserDto },
+      );
 
-      await this.UserModel.syncIndexes();
-      return await this.findOne(id);
+      //await this.UserModel.syncIndexes();
+      return await updateUser;
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -808,14 +805,6 @@ export class UserService {
 
       return saveUser;
     } catch (error) {
-      console.log("");
-      console.log("");
-      console.log("");
-      console.log(error);
-      console.log("");
-      console.log("");
-      console.log("");
-
       throw new BadRequestException(error.message);
     }
   }
