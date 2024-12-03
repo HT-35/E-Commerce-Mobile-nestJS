@@ -6,7 +6,8 @@ import * as crypto from "crypto";
 import { paymentList } from "@/utils/paymentList";
 import { UserService } from "@/modules/user/user.service";
 import { ProductModelService } from "@/modules/product/product.service";
-
+//import dateFormat from "dateformat";
+import dateFormat from "dateformat";
 @Injectable()
 export class PaymentService {
   constructor(
@@ -61,9 +62,9 @@ export class PaymentService {
       const orderDescription = newCart
         .map(
           (item: any) =>
-            `Tên: ${item.name}, Màu: ${item.color}, Giá: ${item.price}, Số lượng: ${item.quantity}`,
+            `-slug:${item.slug}+color:${item.color}+quantity:${item.quantity}`,
         )
-        .join("\n \n");
+        .join("-");
 
       console.log(orderDescription);
 
@@ -82,18 +83,15 @@ export class PaymentService {
 
       const date = new Date();
 
-      const dateFormatModule = await import("dateformat");
-      const dateFormat = dateFormatModule.default || dateFormatModule;
+      //const dateFormatModule = await import("dateformat");
+      //const dateFormat = dateFormatModule.default || dateFormatModule;
+
       const createDate = dateFormat(date, "yyyymmddHHmmss");
       const orderId = dateFormat(date, "HHmmss");
 
-      //const amount = req.body.amount;
       const bankCode = "";
 
-      //const orderInfo = req.body.orderDescription; // nội dung chuyển khoản
-      //const orderType = req.body.orderType;
-
-      const orderInfo = orderDescription; // nội dung chuyển khoản
+      const orderInfo = orderDescription;
 
       let locale = "vn";
       if (locale === null || locale === "") {
@@ -104,12 +102,12 @@ export class PaymentService {
       vnp_Params["vnp_Version"] = "2.1.0";
       vnp_Params["vnp_Command"] = "pay";
       vnp_Params["vnp_TmnCode"] = tmnCode;
-      // vnp_Params['vnp_Merchant'] = ''
+
       vnp_Params["vnp_Locale"] = locale;
       vnp_Params["vnp_CurrCode"] = currCode;
       vnp_Params["vnp_TxnRef"] = orderId;
       vnp_Params["vnp_OrderInfo"] = orderInfo;
-      //vnp_Params["vnp_OrderType"] = orderType;
+
       vnp_Params["vnp_OrderType"] = 110000;
       vnp_Params["vnp_Amount"] = amount * 100;
       vnp_Params["vnp_ReturnUrl"] = returnUrl;

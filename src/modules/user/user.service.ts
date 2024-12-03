@@ -17,7 +17,7 @@ import {
 import mongoose, { Model } from "mongoose";
 
 import { v4 as uuidv4 } from "uuid";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import { hashPassWord } from "@/utils/bcrypt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { ActiveAccount } from "@/auth/dto/activeAccount.dto";
@@ -801,9 +801,9 @@ export class UserService {
       //const newArr = [...user.Bill, newBill];
       //user.Bill = newArr;
       user.Bill.push(newBill);
-      const saveUser = await user.save();
+      await user.save();
 
-      return saveUser;
+      return newBill;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
