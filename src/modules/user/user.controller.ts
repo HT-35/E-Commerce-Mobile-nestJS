@@ -157,6 +157,14 @@ export class UserController {
     return this.userService.createBill({ _id, createBillDto });
   }
 
+  @Patch("/bill/:id")
+  @ResponseMessage("Create Bill")
+  updateBill(@Req() req: any, @Param("id") idBill: string) {
+    const { _id } = req.user;
+    console.log(`_id:`, _id);
+    return this.userService.updateBill({ _id, idBill });
+  }
+
   // ===============================  find user by id  ==================================
   @Get(":id")
   @ResponseMessage("Find User by Id")

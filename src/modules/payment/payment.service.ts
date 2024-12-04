@@ -8,6 +8,7 @@ import { UserService } from "@/modules/user/user.service";
 import { ProductModelService } from "@/modules/product/product.service";
 //import dateFormat from "dateformat";
 import dateFormat from "dateformat";
+import { CreateBillDto } from "@/modules/user/dto/create-bill.dto";
 @Injectable()
 export class PaymentService {
   constructor(
@@ -15,16 +16,32 @@ export class PaymentService {
     private productModelService: ProductModelService,
   ) {}
 
-  async handlePayment(req: any) {
+  async handlePayment({
+    createBillDto,
+
+    req,
+  }: {
+    createBillDto: CreateBillDto;
+
+    req: any;
+  }) {
+    const { _id } = req.user;
     try {
-      const data = req.user;
+      const createBill: any = await this.userService.createBill({
+        createBillDto,
+        _id,
+      });
+      //console.log(createBill);
 
-      const { _id } = data;
+      const _idOrder = createBill._id;
 
-      const productList = req.body.product;
-      console.log(`productList:`, productList);
+      // ==========================================================================================
+
+      const productList = req.body.item;
+      //console.log(`productList:`, productList);
 
       const cart = await this.userService.getAllProductInCart(_id);
+      //console.log(`cart:`, cart);
 
       const newCart = cart
         .map((itemCart: any) => {
@@ -55,18 +72,27 @@ export class PaymentService {
         })
         .filter(Boolean); // Lọc các phần tử null ra khỏi mảng
 
+      //console.log("");
+      //console.log("");
+      //console.log("newCart  :  ", newCart);
+      //console.log("");
+      //console.log("");
+      //console.log("");
+
       const amount = newCart.reduce((total, item) => {
         return +total + +item.price * +item.quantity;
       }, 0);
 
-      const orderDescription = newCart
-        .map(
-          (item: any) =>
-            `-slug:${item.slug}+color:${item.color}+quantity:${item.quantity}`,
-        )
-        .join("-");
+      const orderDescription = _idOrder;
 
-      console.log(orderDescription);
+      //const orderDescription = newCart
+      //  .map(
+      //    (item: any) =>
+      //      `-slug:${item.slug}+color:${item.color}+quantity:${item.quantity}`,
+      //  )
+      //  .join("-");
+
+      //console.log(orderDescription);
 
       //return orderDescription;
 
@@ -127,14 +153,17 @@ export class PaymentService {
 
       vnp_Params["vnp_SecureHash"] = signed;
       vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
+
       return { vnpUrl };
+
+      //return "ok";
     } catch (error) {
-      console.log("");
-      console.log("");
-      console.log("error   ", error);
-      console.log("");
-      console.log("");
-      console.log("");
+      //console.log("");
+      //console.log("");
+      //console.log("error   ", error);
+      //console.log("");
+      //console.log("");
+      //console.log("");
       throw new BadRequestException();
     }
   }

@@ -705,7 +705,72 @@ export class UserService {
         return Number(a) + Number(b.calcPrice);
       }, 0);
 
-      const contentOrderShiping = itemBill.map((item) => {
+      const newBill: Bill = {
+        itemArr: itemBill,
+        email: createBillDto.email,
+        numberPhone: createBillDto.numberPhone,
+        statusShiping: "pending",
+        statusPayment: "unpaid",
+        CodeShipGHN: "",
+        total,
+        addressShiping: createBillDto.addressShiping,
+      };
+
+      user.Bill.push(newBill);
+      const newUser = await user.save();
+
+      const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
+
+      return newBillRecord;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateBill({ _id, idBill }: { _id: string; idBill: string }) {
+    try {
+      const user = await this.findOne(new mongoose.Types.ObjectId(_id));
+      if (!user) {
+        throw new BadRequestException("Not Found User !");
+      }
+
+      const indexBill = user.Bill.findIndex(
+        (item: any) => item._id.toString() === idBill,
+      );
+      console.log(`indexBill:`, indexBill);
+
+      //return "ok";
+
+      //const itemBill: itemBill[] = await Promise.all(
+      //  createBillDto.item.map(async (item) => {
+      //    const product = await this.productServer.findOne(item.slug);
+      //    if (!product) {
+      //      throw new BadRequestException("Not Found Product");
+      //    }
+      //    const indexOption = await product.option.findIndex(
+      //      (item) => item.color === item.color,
+      //    );
+      //    if (indexOption === -1) {
+      //      throw new BadRequestException("Not Found Color Product");
+      //    }
+      //    const price = await product.option[indexOption].price;
+      //    const calc = Number(price) * Number(item.quantity);
+
+      //    return {
+      //      price,
+      //      slug: item.slug,
+      //      color: item.color,
+      //      name: product.name,
+      //      brand: product.brand,
+      //      calcPrice: calc,
+      //      quantity: item.quantity,
+      //    };
+      //  }),
+      //);
+
+      //const total = user.Bill[indexBill].total;
+
+      const contentOrderShiping = user.Bill[indexBill].itemArr.map((item) => {
         return {
           name: `${item.name}`,
           code: `${item.brand}`,
@@ -721,14 +786,16 @@ export class UserService {
         };
       });
 
+      //const indexAddressShiping = user.Bill[indexBill].addressShiping;
+
       const indexAddressShiping = user.address.findIndex(
-        (item) => item.address_detail === createBillDto.addressShiping,
+        (item) => item.address_detail === user.Bill[indexBill].addressShiping,
       );
       if (indexAddressShiping === -1) {
         throw new BadRequestException("Không tìm thấy địa chỉ giao hàng");
       }
 
-      // tạo đợn hàng GHN
+      //// tạo đợn hàng GHN
       const orderData = {
         payment_type_id: 1,
         note: "Gọi điện trước khi giao hàng",
@@ -748,11 +815,11 @@ export class UserService {
         client_order_code: "",
 
         to_name: `${user.name}`,
-        to_phone: `${createBillDto.numberPhone}`,
+        to_phone: `${user.Bill[indexBill].numberPhone}`,
         to_address: `${user.address[indexAddressShiping].address_detail}`,
         to_ward_code: `${user.address[indexAddressShiping].ward_code}`,
         to_district_id: Number(user.address[indexAddressShiping].district_id),
-        cod_amount: total,
+        cod_amount: 0,
         content: "Test chức năng giao hàng của website bán điện thoại",
         weight: 50,
         length: 16,
@@ -778,33 +845,32 @@ export class UserService {
           },
         },
       );
-      //console.log(createShippingGHN.data.data.order_code);
+      ////console.log(createShippingGHN.data.data.order_code);
 
-      const newBill: Bill = {
-        itemArr: itemBill,
-        email: createBillDto.email,
-        numberPhone: createBillDto.numberPhone,
-        status: "pending",
-        CodeShipGHN: await createShippingGHN.data.data.order_code,
-        total,
-        addressShiping: createBillDto.addressShiping,
-      };
-      console.log("");
-      console.log("");
-      console.log("");
-      console.log("newBill", newBill);
-      console.log("");
-      console.log("");
+      user.Bill[indexBill].statusShiping = "pending";
+      user.Bill[indexBill].statusPayment = "paid";
+      user.Bill[indexBill].CodeShipGHN =
+        await createShippingGHN.data.data.order_code;
 
       //await user.Bill.push(newBill);
 
       //const newArr = [...user.Bill, newBill];
       //user.Bill = newArr;
-      user.Bill.push(newBill);
-      await user.save();
 
-      return newBill;
+      console.log("");
+      console.log("");
+      console.log("await createShippingGHN :  ", await createShippingGHN);
+      console.log("");
+      console.log("");
+      console.log("");
+
+      const newUser = await user.save();
+
+      const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
+
+      return newBillRecord;
     } catch (error) {
+      console.log(`error:`, error);
       throw new BadRequestException(error.message);
     }
   }

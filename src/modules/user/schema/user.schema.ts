@@ -109,7 +109,13 @@ export class Bill {
     enum: ["pending", "paid", "shipped", "completed", "canceled"],
     default: "pending",
   })
-  status: "pending" | "paid" | "shipped" | "completed" | "canceled";
+  statusShiping: "pending" | "paid" | "shipped" | "completed" | "canceled";
+
+  @Prop({
+    enum: ["paid", "unpaid"],
+    default: "unpaid",
+  })
+  statusPayment: "paid" | "unpaid";
 
   @Prop({
     type: Number,
