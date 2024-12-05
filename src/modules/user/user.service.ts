@@ -133,7 +133,7 @@ export class UserService {
       });
 
       // Đồng bộ hóa các chỉ mục của mô hình trong cơ sở dữ liệu
-      await this.UserModel.syncIndexes();
+      //await this.UserModel.syncIndexes();
 
       const result = await this.findOneByEmail(createUserDto.email);
 
@@ -141,9 +141,6 @@ export class UserService {
 
       return result;
     } catch (error) {
-      if (error.code === 11000) {
-        throw new BadRequestException(`${error.keyValue.email} đã tồn tại`);
-      }
       throw new BadRequestException(error);
     }
 
