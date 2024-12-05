@@ -46,7 +46,7 @@ export class UserService {
     this.mailerServive.sendMail({
       to: result?.email,
       //from: 'noreply@nestjs.com',
-      subject: "Email test send email with NestJS",
+      subject: "Mã Xác Thực Tài Khoản Tại HTS Store",
       text: "welcome", // plaintext body
 
       template: "./register",

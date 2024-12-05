@@ -46,7 +46,7 @@ import { PaymentModule } from "./modules/payment/payment.module";
           },
         },
         defaults: {
-          from: '"No Reply !! i am software engineering" <no-reply@localhost>',
+          from: 'No Reply ! HTS Store" <no-reply@localhost>',
         },
         //preview: true,
         template: {

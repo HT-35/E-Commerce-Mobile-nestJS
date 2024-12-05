@@ -19,7 +19,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException("Không tìm thấy tài khoản !");
     }
     if (user.isActive === false) {
-      throw new UnauthorizedException("Tài Khoản Chưa Được Active  !!");
+      throw new UnauthorizedException({
+        message: {
+          _idUser: user._id,
+          error: "Tài Khoản Chưa Được Active  !!",
+        },
+        //id: user._id,
+      });
     }
     return user;
   }
