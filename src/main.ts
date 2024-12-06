@@ -14,7 +14,9 @@ async function bootstrap() {
   const PORT = configService.get("PORT");
 
   app.enableCors({
-    origin: true,
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: "*",
   });
 
   // config pipe global
