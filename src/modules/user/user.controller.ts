@@ -109,7 +109,7 @@ export class UserController {
   ) {
     const { _id } = req.user;
 
-    return this.userService.deleteProductQuanlityInCart({ slug, color, _id });
+    return this.userService.deleteProductInCart({ slug, color, _id });
   }
 
   // ===============address ================

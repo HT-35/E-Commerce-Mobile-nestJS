@@ -499,7 +499,7 @@ export class UserService {
     }
   }
 
-  async deleteProductQuanlityInCart({
+  async deleteProductInCart({
     slug,
     color,
     _id,
@@ -508,46 +508,44 @@ export class UserService {
     color: string;
     _id: mongoose.Types.ObjectId;
   }) {
-    console.log(`slug:`, slug);
+    try {
+      console.log(`slug:`, slug);
 
-    const user = await this.findOne(_id);
+      const user = await this.findOne(_id);
 
-    if (!user) {
-      throw new BadRequestException("Not Found User !");
-    }
-    if (user.cart.length === 0) {
-      throw new BadRequestException("Cart is empty");
-    }
-
-    const checkProduct = await user.cart.some((item) => {
-      if (item.slug === slug && item.color === color) {
-        return true;
-      } else {
-        return false;
+      if (!user) {
+        throw new BadRequestException("Not Found User !");
       }
-    });
-
-    if (!checkProduct) {
-      throw new BadRequestException("Not Found Product In Cart");
-    }
-    let newCart: cartItem[];
-    user.cart.forEach(async (item, index) => {
-      console.log("item.slug ", item.slug);
-      console.log("slug", slug);
-      console.log("");
-      console.log("");
-      console.log("item.color", item.color);
-      console.log("color", color);
-      if (item.slug === slug && item.color === color) {
-        newCart = [...user.cart];
-        delete newCart[index];
-
-        user.cart = newCart;
-        await user.save();
-        await this.UserModel.syncIndexes();
+      if (user.cart.length === 0) {
+        throw new BadRequestException("Cart is empty");
       }
-    });
-    return await this.getAllProductInCart(_id);
+
+      const checkProduct = await user.cart.some((item) => {
+        if (item.slug === slug && item.color === color) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+
+      if (!checkProduct) {
+        throw new BadRequestException("Not Found Product In Cart");
+      }
+      let newCart: cartItem[];
+      let newUser;
+      user.cart.forEach(async (item, index) => {
+        if (item.slug === slug && item.color === color) {
+          newCart = [...user.cart];
+          delete newCart[index];
+
+          user.cart = newCart;
+          newUser = await user.save();
+        }
+      });
+      return newUser;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   // ===============  add  Address
@@ -723,6 +721,14 @@ export class UserService {
 
       user.Bill.push(newBill);
       const newUser = await user.save();
+
+      for (const item of itemBill) {
+        await this.deleteProductInCart({
+          _id: new mongoose.Types.ObjectId(_id),
+          color: item.color,
+          slug: item.slug,
+        });
+      }
 
       const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
 
@@ -1039,6 +1045,14 @@ export class UserService {
 
       user.Bill.push(newBill);
       const newUser = await user.save();
+
+      for (const item of itemBill) {
+        await this.deleteProductInCart({
+          _id: new mongoose.Types.ObjectId(_id),
+          color: item.color,
+          slug: item.slug,
+        });
+      }
 
       const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
 
