@@ -98,6 +98,11 @@ export class Bill {
   @Prop({
     type: String,
   })
+  orderer: string;
+
+  @Prop({
+    type: String,
+  })
   numberPhone: string;
 
   @Prop({
@@ -106,10 +111,28 @@ export class Bill {
   CodeShipGHN: string;
 
   @Prop({
-    enum: ["pending", "paid", "shipped", "completed", "canceled"],
+    enum: ["VNPAY", "COD"],
+  })
+  paymentMethod: "VNPAY" | "COD";
+
+  @Prop({
+    enum: [
+      "waiting for payment",
+      "pending",
+      "paid",
+      "shipped",
+      "completed",
+      "canceled",
+    ],
     default: "pending",
   })
-  statusShiping: "pending" | "paid" | "shipped" | "completed" | "canceled";
+  statusShiping:
+    | "waiting for payment"
+    | "pending"
+    | "paid"
+    | "shipped"
+    | "completed"
+    | "canceled";
 
   @Prop({
     enum: ["paid", "unpaid"],

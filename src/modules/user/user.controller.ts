@@ -150,19 +150,32 @@ export class UserController {
   }
 
   // ================================    Bill     ===============================
-  @Post("/bill")
-  @ResponseMessage("Create Bill")
+  @Post("/bill/cod")
+  @ResponseMessage("Create Bill  COD")
   createBill(@Body() createBillDto: CreateBillDto, @Req() req: any) {
     const { _id } = req.user;
-    return this.userService.createBill({ _id, createBillDto });
+    return this.userService.createBillCOD({ _id, createBillDto });
   }
 
-  @Patch("/bill/:id")
-  @ResponseMessage("Create Bill")
+  @Patch("/bill/vnpay/:id")
+  @ResponseMessage("Create Bill  Payment VNPay")
   updateBill(@Req() req: any, @Param("id") idBill: string) {
     const { _id } = req.user;
     console.log(`_id:`, _id);
     return this.userService.updateBill({ _id, idBill });
+  }
+
+  @Get("/bill")
+  @ResponseMessage("Get All Bill")
+  getAllBill(@Query("limit") limit: number, @Query("page") page: number) {
+    return this.userService.getAllBill({ limit, page });
+  }
+
+  @Get("/bill/:idOrder")
+  @ResponseMessage("Get Detail Bill")
+  getDetailBill(@Param("idOrder") idOrder: string, @Req() req: any) {
+    const { _id } = req.user;
+    return this.userService.getDetalBill({ idOrder, _id });
   }
 
   // ===============================  find user by id  ==================================
