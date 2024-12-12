@@ -722,13 +722,13 @@ export class UserService {
       user.Bill.push(newBill);
       const newUser = await user.save();
 
-      for (const item of itemBill) {
-        await this.deleteProductInCart({
-          _id: new mongoose.Types.ObjectId(_id),
-          color: item.color,
-          slug: item.slug,
-        });
-      }
+      //for (const item of itemBill) {
+      //  await this.deleteProductInCart({
+      //    _id: new mongoose.Types.ObjectId(_id),
+      //    color: item.color,
+      //    slug: item.slug,
+      //  });
+      //}
 
       const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
 
@@ -847,6 +847,17 @@ export class UserService {
       console.log("");
 
       const newUser = await user.save();
+
+      const itemBill = user.Bill[indexBill].itemArr;
+      console.log(`itemBill:`, itemBill);
+
+      for (const item of itemBill) {
+        await this.deleteProductInCart({
+          _id: new mongoose.Types.ObjectId(_id),
+          color: item.color,
+          slug: item.slug,
+        });
+      }
 
       const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
 
