@@ -99,6 +99,13 @@ export class Product {
   rom: string;
 
   @Prop({ type: String })
+  chip: string;
+  @Prop({ type: String })
+  sim: string;
+  @Prop({ type: String })
+  design: string;
+
+  @Prop({ type: String })
   cameraBefore: string;
 
   @Prop({ type: String })

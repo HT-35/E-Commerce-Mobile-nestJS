@@ -163,10 +163,10 @@ export class ProductModelService {
   async remove(slug: string) {
     const produc = await this.findOne(slug);
 
-    await Promise.all(
-      produc.option.map(async (item) => {
-        for (const imgItem of item.img) {
-          await this.cloudinaryService.deleteImage(imgItem.cloudinary_id);
+    await Promise?.all(
+      produc?.option?.map(async (item) => {
+        for (const imgItem of item?.img) {
+          await this?.cloudinaryService?.deleteImage(imgItem.cloudinary_id);
         }
       }),
     );
@@ -256,16 +256,16 @@ export class ProductModelService {
   async uploadImg(files: Express.Multer.File[]) {
     console.log("files:", files);
 
-    const arrFile = await Promise.all(
-      files.map(async (item) => {
-        const img = await this.cloudinaryService.uploadImage(
+    const arrFile = await Promise?.all(
+      files?.map(async (item) => {
+        const img = await this?.cloudinaryService?.uploadImage(
           item,
-          TypeFolderClouldinary.PRODUCT,
+          TypeFolderClouldinary?.PRODUCT,
         );
 
         return {
-          link: img.secure_url,
-          cloudinary_id: img.public_id,
+          link: img?.secure_url,
+          cloudinary_id: img?.public_id,
         };
       }),
     );

@@ -10,12 +10,12 @@ export const ResponseMessage = (mess: string) =>
 export const Is_Public_Key = "IsPublic";
 export const IsPublic = () => SetMetadata(Is_Public_Key, true);
 
-// roles
+// role
 
-export const Roles_Key = "roles";
+export const Roles_Key = "role";
 export enum Roles_Type {
   ADMIN = "admin",
   EMPLOYEE = "employee",
   USER = "user",
 }
-export const Roles = (...roles: Roles_Type[]) => SetMetadata(Roles_Key, roles);
+export const Roles = (...role: Roles_Type[]) => SetMetadata(Roles_Key, role);

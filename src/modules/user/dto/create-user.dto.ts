@@ -1,3 +1,4 @@
+import { Roles_Type } from "@/public/DecoratorCustom";
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateUserDto {
@@ -22,5 +23,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   phone?: string;
 
-  //roles?: Roles_Type;
+  @IsString()
+  @IsNotEmpty()
+  design?: string;
+
+  //role?: Roles_Type;
 }

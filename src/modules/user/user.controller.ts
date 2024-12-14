@@ -56,10 +56,7 @@ export class UserController {
 
   @Patch("update/:id")
   @ResponseMessage("Update User")
-  update(
-    @Param("id") id: mongoose.Types.ObjectId,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  update(@Param("id") id: mongoose.Types.ObjectId, @Body() updateUserDto: any) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException("Id phải là mongoDb");
     }

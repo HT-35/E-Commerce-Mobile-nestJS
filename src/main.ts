@@ -30,7 +30,7 @@ async function bootstrap() {
   // config jwt-auth guard glogbal
   app.useGlobalGuards(new JwtAuthGuard(reflector));
 
-  // guard check roles
+  // guard check role
   app.useGlobalGuards(new RolesGuard(reflector));
 
   app.useGlobalInterceptors(new TransformInterceptor(reflector));

@@ -1,13 +1,4 @@
-import {
-  IsString,
-  IsNumber,
-  IsBoolean,
-  IsArray,
-  IsMongoId,
-  ValidateNested,
-  IsOptional,
-  IsEmpty,
-} from "class-validator";
+import { IsString, IsNumber, IsArray, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 class OptionDTO {
@@ -31,62 +22,21 @@ class ImageDTO {
   cloudinary_id: string;
 }
 
-class ReviewProductDTO {
-  @IsString()
-  name: string;
-
-  @IsString()
-  comment: string;
-
-  @IsNumber()
-  star: number;
-}
-
-class ReplieCommentProductDTO {
-  @IsString()
-  content: string;
-
-  @IsBoolean()
-  isAdmin: boolean;
-
-  @IsString()
-  nameUser: string;
-
-  @IsMongoId()
-  byUser: string;
-}
-
-class CommentProductDTO {
-  @IsString()
-  author: string;
-
-  @IsString()
-  status: string;
-
-  @IsBoolean()
-  isAdmin: boolean;
-
-  @IsString()
-  avatar: string;
-
-  @IsString()
-  content: string;
-
-  @IsMongoId()
-  byUser: string;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ReplieCommentProductDTO)
-  replies: ReplieCommentProductDTO[];
-}
-
 export class CreateProductDto {
   @IsString()
   name: string;
 
   @IsString()
   brand: string;
+
+  @IsString()
+  chip: string;
+
+  @IsString()
+  sim: string;
+
+  @IsString()
+  design: string;
 
   @IsNumber()
   amount: number;
@@ -119,20 +69,4 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => OptionDTO)
   option: OptionDTO[];
-
-  //@IsEmpty()
-  //@IsArray()
-  //@ValidateNested({ each: true })
-  //@Type(() => ReviewProductDTO)
-  //reviews: ReviewProductDTO[];
-
-  //@IsEmpty()
-  //@IsArray()
-  //@ValidateNested({ each: true })
-  //@Type(() => CommentProductDTO)
-  //comments: CommentProductDTO[];
-
-  @IsOptional() // Đây là trường duy nhất không bắt buộc
-  @IsString()
-  blog?: string;
 }

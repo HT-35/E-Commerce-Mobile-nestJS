@@ -44,7 +44,7 @@ export class PaymentService {
       //console.log(`cart:`, cart);
 
       const newCart = cart
-        .map((itemCart: any) => {
+        ?.map((itemCart: any) => {
           // Tìm item tương ứng trong items dựa trên slug và color
           const matchedItem = productList.find(
             (item) =>
@@ -72,29 +72,11 @@ export class PaymentService {
         })
         .filter(Boolean); // Lọc các phần tử null ra khỏi mảng
 
-      //console.log("");
-      //console.log("");
-      //console.log("newCart  :  ", newCart);
-      //console.log("");
-      //console.log("");
-      //console.log("");
-
       const amount = newCart.reduce((total, item) => {
         return +total + +item.price * +item.quantity;
       }, 0);
 
       const orderDescription = _idOrder;
-
-      //const orderDescription = newCart
-      //  .map(
-      //    (item: any) =>
-      //      `-slug:${item.slug}+color:${item.color}+quantity:${item.quantity}`,
-      //  )
-      //  .join("-");
-
-      //console.log(orderDescription);
-
-      //return orderDescription;
 
       const ipAddr =
         req.headers["x-forwarded-for"] ||

@@ -669,13 +669,13 @@ export class UserService {
       }
 
       const itemBill: itemBill[] = await Promise.all(
-        createBillDto.item.map(async (item) => {
-          const product = await this.productServer.findOne(item.slug);
+        createBillDto?.item?.map(async (item) => {
+          const product = await this?.productServer?.findOne(item?.slug);
           if (!product) {
             throw new BadRequestException("Not Found Product");
           }
-          const indexOption = await product.option.findIndex(
-            (item) => item.color === item.color,
+          const indexOption = await product?.option?.findIndex(
+            (item) => item?.color === item?.color,
           );
           if (indexOption === -1) {
             throw new BadRequestException("Not Found Color Product");
@@ -722,14 +722,6 @@ export class UserService {
       user.Bill.push(newBill);
       const newUser = await user.save();
 
-      //for (const item of itemBill) {
-      //  await this.deleteProductInCart({
-      //    _id: new mongoose.Types.ObjectId(_id),
-      //    color: item.color,
-      //    slug: item.slug,
-      //  });
-      //}
-
       const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
 
       return newBillRecord;
@@ -751,7 +743,7 @@ export class UserService {
       );
       console.log(`indexBill:`, indexBill);
 
-      const contentOrderShiping = user.Bill[indexBill].itemArr.map((item) => {
+      const contentOrderShiping = user.Bill[indexBill]?.itemArr?.map((item) => {
         return {
           name: `${item.name}`,
           code: `${item.brand}`,
@@ -851,6 +843,7 @@ export class UserService {
       const itemBill = user.Bill[indexBill].itemArr;
       console.log(`itemBill:`, itemBill);
 
+      const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
       for (const item of itemBill) {
         await this.deleteProductInCart({
           _id: new mongoose.Types.ObjectId(_id),
@@ -858,8 +851,6 @@ export class UserService {
           slug: item.slug,
         });
       }
-
-      const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
 
       return newBillRecord;
     } catch (error) {
@@ -929,14 +920,14 @@ export class UserService {
         throw new BadRequestException("Not Found User !");
       }
 
-      const itemBill: itemBill[] = await Promise.all(
-        createBillDto.item.map(async (item) => {
-          const product = await this.productServer.findOne(item.slug);
+      const itemBill: itemBill[] = await Promise?.all(
+        createBillDto?.item?.map(async (item) => {
+          const product = await this?.productServer?.findOne(item?.slug);
           if (!product) {
             throw new BadRequestException("Not Found Product");
           }
-          const indexOption = await product.option.findIndex(
-            (item) => item.color === item.color,
+          const indexOption = await product?.option?.findIndex(
+            (item) => item?.color === item?.color,
           );
           if (indexOption === -1) {
             throw new BadRequestException("Not Found Color Product");
@@ -960,9 +951,9 @@ export class UserService {
         return Number(a) + Number(b.calcPrice);
       }, 0);
 
-      const contentOrderShiping = itemBill.map((item) => {
+      const contentOrderShiping = itemBill?.map((item) => {
         return {
-          name: `${item.name}`,
+          name: `${item?.name}`,
           code: `${item.brand}`,
           quantity: Number(item.quantity),
           price: +item.price,
@@ -1057,6 +1048,7 @@ export class UserService {
       user.Bill.push(newBill);
       const newUser = await user.save();
 
+      const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
       for (const item of itemBill) {
         await this.deleteProductInCart({
           _id: new mongoose.Types.ObjectId(_id),
@@ -1065,12 +1057,11 @@ export class UserService {
         });
       }
 
-      const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
-
       return newBillRecord;
     } catch (error) {
-      console.log(`error:`, error);
-      throw new BadRequestException(error.message);
+      console.error("Response data:", error.response?.data);
+
+      throw new BadRequestException(error.response?.data.code_message_value);
     }
   }
 

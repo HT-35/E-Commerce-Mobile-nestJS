@@ -1,12 +1,12 @@
-import { Roles_Key } from '@/public/DecoratorCustom';
+import { Roles_Key } from "@/public/DecoratorCustom";
 import {
   Injectable,
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -25,15 +25,16 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
+    console.log(`user:`, user);
 
     if (
       user &&
-      user.roles &&
-      RolesArr.some((item) => user.roles.includes(item))
+      user.role &&
+      RolesArr.some((item) => user.role.includes(item))
     ) {
       return true;
     } else {
-      throw new UnauthorizedException('Bạn không có quyền truy cập !!');
+      throw new UnauthorizedException("Bạn không có quyền truy cập !!");
     }
   }
 }
