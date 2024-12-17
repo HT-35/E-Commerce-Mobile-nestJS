@@ -12,6 +12,7 @@ import { Server, Socket } from "socket.io";
 @WebSocketGateway(5001, {
   cors: {
     origin: "*", // Cho phép tất cả các nguồn gốc
+    path: "/ws",
   },
 })
 export class StreamingGateway

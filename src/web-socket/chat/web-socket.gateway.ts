@@ -15,6 +15,7 @@ import { Server, Socket } from "socket.io";
 @WebSocketGateway(5000, {
   cors: {
     origin: "*",
+    path: "/ws",
   },
 })
 export class ChatSocket
