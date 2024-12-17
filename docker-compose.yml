@@ -1,8 +1,28 @@
+#version: "3"
+
+#services:
+#  nestjs:
+#    image: node:22-alpine # Bạn có thể thay thế bằng phiên bản Node.js mà bạn cần
+#    working_dir: /usr/src/app
+#    volumes:
+#      - ./:/usr/src/app # Gắn kết thư mục hiện tại với thư mục trong container
+#      - /usr/src/app/node_modules # Đảm bảo không ghi đè thư mục node_modules
+#    ports:
+#      - "4000:4000"
+#      - "5001:5001"
+#      - "5000:5000"
+#    command: sh -c "npm install && npm run dev"
+
+#volumes:
+#  mongo-data:
+#    driver: local
+
 version: "3"
 
 services:
   nestjs:
     image: node:22-alpine # Bạn có thể thay thế bằng phiên bản Node.js mà bạn cần
+    container_name: nestjs
     working_dir: /usr/src/app
     volumes:
       - ./:/usr/src/app # Gắn kết thư mục hiện tại với thư mục trong container
@@ -12,6 +32,18 @@ services:
       - "5001:5001"
       - "5000:5000"
     command: sh -c "npm install && npm run dev"
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf # Ánh xạ file cấu hình Nginx vào container
+      - ./etc/nginx/ssl:/etc/nginx/ssl # Ánh xạ thư mục SSL vào container
+    ports:
+      - "80:80" # Cổng HTTP
+      - "443:443" # Cổng HTTPS
+    depends_on:
+      - nestjs # Nginx cần phải phụ thuộc vào NestJS
 
 volumes:
   mongo-data:
