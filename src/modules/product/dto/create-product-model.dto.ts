@@ -8,6 +8,9 @@ class OptionDTO {
   @IsString()
   price: string;
 
+  @IsNumber()
+  amount: number;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ImageDTO)
@@ -38,8 +41,8 @@ export class CreateProductDto {
   @IsString()
   design: string;
 
-  @IsNumber()
-  amount: number;
+  //@IsNumber()
+  //amount: number;
 
   @IsString()
   os: string;

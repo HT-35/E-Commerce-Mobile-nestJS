@@ -11,7 +11,7 @@ import {
   Req,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { UpdateUserDto } from "./dto/update-user.dto";
+
 import { ResponseMessage } from "@/public/DecoratorCustom";
 import mongoose from "mongoose";
 import { CreateEmployeeDto } from "@/modules/user/dto/CreateEmployeeDto";
@@ -38,8 +38,6 @@ export class UserController {
     @Query("current") current: number,
     @Query("pageSize") pageSize: number,
   ) {
-    console.log("user");
-
     return this.userService.findAll(query, +current, +pageSize);
   }
 
@@ -158,7 +156,7 @@ export class UserController {
   @ResponseMessage("Create Bill  Payment VNPay")
   updateBill(@Req() req: any, @Param("id") idBill: string) {
     const { _id } = req.user;
-    console.log(`_id:`, _id);
+
     return this.userService.updateBill({ _id, idBill });
   }
 

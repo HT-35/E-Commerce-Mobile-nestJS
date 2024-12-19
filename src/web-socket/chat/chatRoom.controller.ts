@@ -28,7 +28,6 @@ export class ChatController {
   @Post("/send")
   @ResponseMessage("Customer Send Message To Employee")
   async createChatRoom(@Body() data: sendMessageDto) {
-    console.log(`data:`, data);
     return this.chatService.createMessage({
       customerId: data.customerId,
       receiverId: data.receiverId,
@@ -40,8 +39,6 @@ export class ChatController {
   @Post("/reply/")
   @ResponseMessage("Employee Reply  Message Of Employee")
   async updateRoomAfterReply(@Body() data: employeeReplyMessageDto) {
-    console.log(data.employeeId, data.customerId, data.messages);
-
     return this.chatService.updateRoomAfterReply({
       customerId: data.customerId,
       employeeId: data.employeeId,

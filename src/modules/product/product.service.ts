@@ -4,7 +4,7 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import mongoose, { Model } from "mongoose";
 import { Product } from "@/modules/product/schema/product-model.schema";
 import { CreateProductDto } from "@/modules/product/dto/create-product-model.dto";
-import { UpdateProductModelDto } from "@/modules/product/dto/update-product-model.dto";
+//import { UpdateProductModelDto } from "@/modules/product/dto/update-product-model.dto";
 import aqp from "api-query-params";
 import { CommentDTO } from "@/modules/product/dto/CommentDTO.dto";
 import { ReplyCommentDTO } from "@/modules/product/dto/RepCommentDTO.dto";
@@ -116,14 +116,7 @@ export class ProductModelService {
     }
   }
 
-  async update(slug: string, updateProductModelDto: UpdateProductModelDto) {
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log("updateProductModelDto:", updateProductModelDto);
-    console.log("");
-    console.log("");
-    console.log("");
+  async update(slug: string, updateProductModelDto: any) {
     const product = await this.findOne(slug);
 
     try {
@@ -254,8 +247,6 @@ export class ProductModelService {
   }
 
   async uploadImg(files: Express.Multer.File[]) {
-    console.log("files:", files);
-
     const arrFile = await Promise?.all(
       files?.map(async (item) => {
         const img = await this?.cloudinaryService?.uploadImage(

@@ -15,7 +15,7 @@ import {
 } from "@nestjs/common";
 
 import { CreateProductDto } from "@/modules/product/dto/create-product-model.dto";
-import { UpdateProductModelDto } from "@/modules/product/dto/update-product-model.dto";
+//import { UpdateProductModelDto } from "@/modules/product/dto/update-product-model.dto";
 import { ResponseMessage, Roles, Roles_Type } from "@/public/DecoratorCustom";
 import { CommentDTO } from "@/modules/product/dto/CommentDTO.dto";
 import { ReplyCommentDTO } from "@/modules/product/dto/RepCommentDTO.dto";
@@ -49,10 +49,7 @@ export class ProductModelController {
 
   @Patch(":slug")
   @ResponseMessage("Update Product")
-  update(
-    @Param("slug") slug: string,
-    @Body() updateProductModelDto: UpdateProductModelDto,
-  ) {
+  update(@Param("slug") slug: string, @Body() updateProductModelDto: any) {
     if (Object.values(updateProductModelDto).length === 0) {
       throw new BadGatewayException(
         "Phải gửi tối thiểu 1 trường để cập nhật sản phẩm !",

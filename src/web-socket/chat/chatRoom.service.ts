@@ -53,8 +53,6 @@ export class chatService {
     receiverId: string;
     messages: string;
   }) {
-    console.log(customerId, receiverId, nameCustomer, messages);
-
     try {
       const findChatRoom = await this.findChatRoomByCustomerId(customerId);
 

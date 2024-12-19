@@ -22,8 +22,6 @@ export class StreamingGateway
   private activeUsers: string[] = []; // Lưu userId và socketId của người dùng
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log("Client StreamingGateway kết nôi  " + client.id);
-
     //this.server.to(client.id).emit("isConnect", "Connect Successfull");
     this.server
       .to(client.id)
@@ -31,7 +29,6 @@ export class StreamingGateway
   }
 
   handleDisconnect(socket: Socket) {
-    console.log(`Client disconnected: ${socket.id}`);
     this.server.emit("streamer-disconnected", socket.id);
   }
 
@@ -47,23 +44,9 @@ export class StreamingGateway
 
   @SubscribeMessage("client-join-stream")
   handleClientJoinStream(socket: Socket, viewerId: any) {
-    console.log("");
-    console.log("");
-    console.log("client-join-stream:  ", viewerId);
-    console.log("");
-    console.log("");
-    console.log("");
-
     if (this.activeUsers.includes(viewerId.viewerId) === false) {
       this.activeUsers.push(viewerId.viewerId);
     }
-
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log("this.activeUsers", this.activeUsers);
-    console.log("");
-    console.log("");
 
     this.server.emit("Admin-reciever-client", viewerId);
     this.server.emit("count-connect-stream", this.activeUsers.length);
@@ -71,10 +54,6 @@ export class StreamingGateway
 
   @SubscribeMessage("client-leave-stream")
   handleClientDelete(socket: Socket, viewerId: any) {
-    //console.log("");
-    //console.log("client-leave-stream:  ", viewerId);
-    //console.log("");
-
     const index = this.activeUsers.indexOf(viewerId.viewerId);
 
     if (index !== -1) {
@@ -87,9 +66,6 @@ export class StreamingGateway
       //);
     }
 
-    console.log("this.activeUsers:", this.activeUsers);
-    console.log("");
-
     // Bạn có thể phát sự kiện nếu cần thiết
     // this.server.emit("Admin-reciever-client", viewerId);
     this.server.emit("count-connect-stream", this.activeUsers.length);
@@ -97,13 +73,6 @@ export class StreamingGateway
 
   @SubscribeMessage("employee-unload")
   handleEmployeeUnLoad(socket: Socket, data: any) {
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log("end-live", data);
-    console.log("");
-    console.log("");
-
     this.server.emit("end-livestream");
   }
 
@@ -117,13 +86,6 @@ export class StreamingGateway
     socket: Socket,
     { message, name, role }: { message: any; name: string; role: string },
   ) {
-    console.log("");
-    console.log("");
-    console.log(">> messageChat : ", message);
-    console.log(">>> viewerId", name);
-    console.log(">> role:", role);
-    console.log("");
-
     socket.broadcast.emit("chat-all", { message, name, role });
   }
 

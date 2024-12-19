@@ -7,6 +7,9 @@ export type ProductDocument = HydratedDocument<Product>;
 class Option {
   color: string;
   price: string;
+
+  amount: number;
+
   img: [
     {
       link: string;
@@ -74,8 +77,8 @@ export class Product {
   @Prop({ type: String, required: true })
   brand: string;
 
-  @Prop({ type: Number })
-  amount: number;
+  //@Prop({ type: Number })
+  //amount: number;
 
   @Prop({ type: String })
   blog: string;

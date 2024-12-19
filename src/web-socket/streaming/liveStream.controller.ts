@@ -17,7 +17,7 @@ export class LiveStreamController {
   }
 
   @Post("/end")
-  @IsPublic()
+  //@IsPublic()
   @ResponseMessage("End Live Stream")
   handleEndLiveStream(@Body() data: any) {
     return this.liveStreamService.handleEndLiveStream();
@@ -32,8 +32,6 @@ export class LiveStreamController {
   @Get("/:id")
   @ResponseMessage("Get Detail LiveStream")
   handleGetDetailLiveStream(@Param("id") id: string) {
-    console.log(id);
-
     return this.liveStreamService.findLiveStreamById(id);
   }
 

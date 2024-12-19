@@ -50,7 +50,6 @@ export class AuthController {
   @IsPublic()
   @ResponseMessage("Re-Send OTP")
   ReSendCodeId(@Query("email") email: string) {
-    console.log("email: >>", email);
     return this.authService.ReSendCodeId(email);
   }
 

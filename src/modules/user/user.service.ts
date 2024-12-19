@@ -397,7 +397,6 @@ export class UserService {
 
   async getAllProductInCart(_id: mongoose.Types.ObjectId) {
     try {
-      console.log(`_id:`, _id);
       //const user = await this.findOne(_id);
 
       const user = await this.UserModel.findOne({ _id }).populate({
@@ -509,8 +508,6 @@ export class UserService {
     _id: mongoose.Types.ObjectId;
   }) {
     try {
-      console.log(`slug:`, slug);
-
       const user = await this.findOne(_id);
 
       if (!user) {
@@ -565,7 +562,6 @@ export class UserService {
       if (checkDuplicate) {
         throw new BadRequestException("Địa chỉ giao hàng cụ thể đã tồn tại !");
       }
-      console.log(checkDuplicate);
 
       user.address.push(address);
       const newUser = await user.save();
@@ -623,14 +619,6 @@ export class UserService {
     if (!updateCart) {
       throw new BadRequestException(updateCart);
     }
-
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log(updateCart);
-    console.log("");
-    console.log("");
-    //console.log("");
 
     return await this.findOne(new mongoose.Types.ObjectId(_id));
   }
@@ -741,7 +729,6 @@ export class UserService {
       const indexBill = user.Bill.findIndex(
         (item: any) => item._id.toString() === idBill,
       );
-      console.log(`indexBill:`, indexBill);
 
       const contentOrderShiping = user.Bill[indexBill]?.itemArr?.map((item) => {
         return {
@@ -808,13 +795,6 @@ export class UserService {
         items: [...contentOrderShiping],
       };
 
-      console.log("");
-      console.log("");
-      console.log("");
-      console.log("orderData   :  ", orderData);
-      console.log("");
-      console.log("");
-
       const createShippingGHN = await axios.post(
         "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
         orderData,
@@ -831,17 +811,9 @@ export class UserService {
       user.Bill[indexBill].CodeShipGHN =
         await createShippingGHN.data.data.order_code;
 
-      console.log("");
-      console.log("");
-      console.log("await createShippingGHN :  ", await createShippingGHN);
-      console.log("");
-      console.log("");
-      console.log("");
-
       const newUser = await user.save();
 
       const itemBill = user.Bill[indexBill].itemArr;
-      console.log(`itemBill:`, itemBill);
 
       const newBillRecord = newUser.Bill[newUser.Bill.length - 1];
       for (const item of itemBill) {
@@ -854,7 +826,6 @@ export class UserService {
 
       return newBillRecord;
     } catch (error) {
-      console.log(`error:`, error);
       throw new BadRequestException(error.message);
     }
   }
@@ -947,6 +918,27 @@ export class UserService {
         }),
       );
 
+      // giảm số lượng khi mua hàng thành công
+
+      for (const i of itemBill) {
+        const product = await this.productServer.findOne(i.slug);
+        const findIndexOption = product.option.findIndex(
+          (item) => item.color === i.color,
+        );
+
+        if (+product.option[findIndexOption].amount < Number(i.quantity)) {
+          throw new BadRequestException(
+            `Sản Phẩm ${i.name} chỉ còn ${product.option[findIndexOption].amount} sản phẩm`,
+          );
+        }
+
+        //if (Number(product.amount) < Number(i.quantity)) {
+        //  throw new BadRequestException(
+        //    `Sản Phẩm ${i.name} chỉ còn ${product.amount} sản phẩm`,
+        //  );
+        //}
+      }
+
       const total = itemBill.reduce((a, b) => {
         return Number(a) + Number(b.calcPrice);
       }, 0);
@@ -1038,12 +1030,6 @@ export class UserService {
         total,
         addressShiping: createBillDto.addressShiping,
       };
-      console.log("");
-      console.log("");
-      console.log("");
-      console.log("newBill", newBill);
-      console.log("");
-      console.log("");
 
       user.Bill.push(newBill);
       const newUser = await user.save();
@@ -1057,11 +1043,37 @@ export class UserService {
         });
       }
 
+      for (const i of itemBill) {
+        console.log(i);
+        //const newQuantity = this.productServer.findOne({ _id: i._id });
+        const product = await this.productServer.findOne(i.slug);
+
+        const findIndexOption = product.option.findIndex(
+          (item) => item.color === i.color,
+        );
+
+        //if (+product.option[findIndexOption].amount < Number(i.quantity)) {
+        //  throw new BadRequestException(
+        //    `Sản Phẩm ${i.name} chỉ còn ${product.option[findIndexOption].amount} sản phẩm`,
+        //  );
+        //}
+
+        //console.log(`product:`, product);
+        const newQuantity =
+          +product.option[findIndexOption].amount - Number(i.quantity);
+        console.log(`newQuantity:`, newQuantity);
+        product.option[findIndexOption].amount = newQuantity;
+        await product.save();
+      }
+
       return newBillRecord;
     } catch (error) {
-      console.error("Response data:", error.response?.data);
+      const data =
+        error?.response?.data?.code_message_value ||
+        error?.response?.message ||
+        "Unknown error";
 
-      throw new BadRequestException(error.response?.data.code_message_value);
+      throw new BadGatewayException(data);
     }
   }
 

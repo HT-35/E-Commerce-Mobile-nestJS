@@ -86,7 +86,7 @@ export class LiveStreamService {
       const liveStream = await this.chatLiveStream.find({
         isLiveStream: true,
       });
-      console.log(`liveStream:`, liveStream);
+
       return liveStream;
     } catch (error) {
       throw new BadRequestException(error);

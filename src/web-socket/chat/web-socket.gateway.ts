@@ -37,8 +37,6 @@ export class ChatSocket
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log("Client ChatSocket kết nôi " + client.id);
-
     this.server
       .to(client.id)
       .emit("isConnect", "Connect Socket Chat Successfull");
@@ -77,7 +75,6 @@ export class ChatSocket
     // Lưu userId và socketId khi người dùng kết nối
     this.activeUsers.set(userId, client.id);
     //console.log(`activeUsers:`, this.activeUsers);
-    console.log("message client : ", message);
 
     //// Người dùng join vào phòng chat của chính họ
     //client.join(userId);
@@ -117,13 +114,6 @@ export class ChatSocket
   //================================================
   @SubscribeMessage("join-as-viewer")
   handleJoinAsViewer(socket: Socket, viewerId: string) {
-    console.log("");
-    console.log("");
-    console.log("");
-    console.log(`Viewer joined with ID: ${viewerId}`);
-    console.log("");
-    console.log("");
-    console.log("");
     socket.join("viewers");
     //this.server.to("streamers").emit("viewer-connected", viewerId);
     this.server
