@@ -28,6 +28,7 @@ export class UserController {
   @Post()
   @ResponseMessage("Register Employee !")
   registerEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
+    //console.log(`createEmployeeDto:`, createEmployeeDto);
     return this.userService.registerEmployee(createEmployeeDto);
   }
 

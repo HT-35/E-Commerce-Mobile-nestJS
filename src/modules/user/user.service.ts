@@ -156,7 +156,7 @@ export class UserService {
     }
 
     try {
-      await this.UserModel.create({
+      const createUser = await this.UserModel.create({
         name: createEmployeeDto.name,
         email: createEmployeeDto.email,
         password: 1111, // defaul password
@@ -164,14 +164,16 @@ export class UserService {
         role: createEmployeeDto.role,
         //isActive: true,
       });
+      console.log(`createUser:`, createUser);
 
       // Đồng bộ hóa các chỉ mục của mô hình trong cơ sở dữ liệu
       //await this.UserModel.syncIndexes();
 
-      const result = await this.findOneByEmail(createEmployeeDto.email);
+      //const result = await this.findOneByEmail(createEmployeeDto.email);
 
-      return result;
+      return createUser;
     } catch (error) {
+      console.log(`error:`, error);
       throw new BadRequestException(error);
     }
   }
