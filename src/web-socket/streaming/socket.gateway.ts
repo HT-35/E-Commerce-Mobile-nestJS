@@ -33,14 +33,7 @@ export class StreamingGateway
   }
 
   @SubscribeMessage("admin-Conect")
-  handleAdminConnect(socket: Socket, viewerId: string) {
-    //console.log("");
-    //console.log("");
-    //console.log("viewerId:  ", viewerId);
-    //console.log("");
-    //console.log("");
-    //console.log("");
-  }
+  handleAdminConnect(socket: Socket, viewerId: string) {}
 
   @SubscribeMessage("client-join-stream")
   handleClientJoinStream(socket: Socket, viewerId: any) {

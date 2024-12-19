@@ -156,6 +156,7 @@ export class UserController {
   @ResponseMessage("Create Bill  Payment VNPay")
   updateBill(@Req() req: any, @Param("id") idBill: string) {
     const { _id } = req.user;
+    console.log(`_id:`, _id);
 
     return this.userService.updateBill({ _id, idBill });
   }

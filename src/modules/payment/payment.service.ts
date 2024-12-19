@@ -31,17 +31,14 @@ export class PaymentService {
         createBillDto,
         _id,
       });
-      //console.log(createBill);
 
       const _idOrder = createBill._id;
 
       // ==========================================================================================
 
       const productList = req.body.item;
-      //console.log(`productList:`, productList);
 
       const cart = await this.userService.getAllProductInCart(_id);
-      //console.log(`cart:`, cart);
 
       const newCart = cart
         ?.map((itemCart: any) => {
@@ -59,7 +56,7 @@ export class PaymentService {
             // Kiểm tra optionIndex hợp lệ trước khi truy cập các giá trị bên trong
             const option =
               optionIndex !== -1 ? itemCart.slug.option[optionIndex] : {};
-            //console.log(`itemCart:`, itemCart);
+
             return {
               color: itemCart?.color,
               slug: itemCart?.slug?.slug,
@@ -140,12 +137,6 @@ export class PaymentService {
 
       //return "ok";
     } catch (error) {
-      //console.log("");
-      //console.log("");
-      //console.log("error   ", error);
-      //console.log("");
-      //console.log("");
-      //console.log("");
       throw new BadRequestException();
     }
   }

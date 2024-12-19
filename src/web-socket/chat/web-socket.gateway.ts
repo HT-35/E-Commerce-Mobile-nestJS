@@ -43,8 +43,6 @@ export class ChatSocket
   }
 
   handleDisconnect(client: Socket) {
-    //console.log(`Client disconnected: ${client.id}`);
-    // Xử lý nếu người dùng ngắt kết nối
     const userId = this.getUserBySocketId(client.id);
     if (userId) {
       this.activeUsers.delete(userId);
@@ -74,10 +72,6 @@ export class ChatSocket
   ) {
     // Lưu userId và socketId khi người dùng kết nối
     this.activeUsers.set(userId, client.id);
-    //console.log(`activeUsers:`, this.activeUsers);
-
-    //// Người dùng join vào phòng chat của chính họ
-    //client.join(userId);
 
     this.server.emit("AdminReceiveMessageByUser", { userId, name, message });
   }
@@ -87,7 +81,6 @@ export class ChatSocket
   handleJoinRoom(client: Socket, userId: string) {
     client.join(userId);
 
-    //console.log(" ");
     //console.log(`Nhân viên đã tham gia vào phòng của userId: ${userId}`);
     //console.log(" ");
   }
@@ -98,12 +91,6 @@ export class ChatSocket
     client: Socket,
     { userId, message }: { userId: string; message: string },
   ) {
-    //console.log("");
-    //console.log("");
-    //console.log(` >>>  message  userId:`, userId);
-    //console.log(` >>>  message admin:`, message);
-    //console.log("");
-    //console.log("");
     // Phát tin nhắn tới người dùng trong phòng có mã userId
     this.server
       .to(userId)

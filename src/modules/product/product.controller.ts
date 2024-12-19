@@ -112,14 +112,6 @@ export class ProductModelController {
   @UseInterceptors(FilesInterceptor("files", 10)) // 'files' là tên của field trong form-data, 4 là số lượng file tối đa
   @ResponseMessage("Img Product")
   uploadImg(@UploadedFiles() files: Express.Multer.File[]) {
-    //console.log("");
-    //console.log("");
-    //console.log("");
-    //console.log("files:", files);
-    //console.log("");
-    //console.log("");
-    //console.log("");
-
     if (!files || files.length === 0) {
       throw new BadRequestException("Missing Img");
     }

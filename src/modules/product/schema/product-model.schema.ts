@@ -8,6 +8,7 @@ class Option {
   color: string;
   price: string;
 
+  @Prop({ type: Number, required: true, default: 0 })
   amount: number;
 
   img: [

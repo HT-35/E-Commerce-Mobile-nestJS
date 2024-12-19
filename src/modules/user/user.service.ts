@@ -1,3 +1,4 @@
+import { Message } from "./../../web-socket/chat/entities/chatRoom.schema";
 import {
   BadGatewayException,
   BadRequestException,
@@ -653,7 +654,7 @@ export class UserService {
     try {
       const user = await this.findOne(new mongoose.Types.ObjectId(_id));
       if (!user) {
-        throw new BadRequestException("Not Found User !");
+        throw new BadRequestException("Not Found User!");
       }
 
       const itemBill: itemBill[] = await Promise.all(
@@ -662,13 +663,13 @@ export class UserService {
           if (!product) {
             throw new BadRequestException("Not Found Product");
           }
-          const indexOption = await product?.option?.findIndex(
-            (item) => item?.color === item?.color,
+          const indexOption = product?.option?.findIndex(
+            (opt) => opt?.color === item?.color,
           );
           if (indexOption === -1) {
             throw new BadRequestException("Not Found Color Product");
           }
-          const price = await product.option[indexOption].price;
+          const price = product.option[indexOption].price;
           const calc = Number(price) * Number(item.quantity);
 
           return {
@@ -683,15 +684,28 @@ export class UserService {
         }),
       );
 
+      for (const i of itemBill) {
+        const product = await this.productServer.findOne(i.slug);
+        const findIndexOption = product.option.findIndex(
+          (opt) => opt.color === i.color,
+        );
+
+        if (+product.option[findIndexOption].amount < Number(i.quantity)) {
+          throw new BadRequestException(
+            `Sản phẩm ${i.name} chỉ còn ${product.option[findIndexOption].amount} sản phẩm`,
+          );
+        }
+      }
+
       const indexAddressShiping = user.address.findIndex(
-        (item) => item.address_detail === createBillDto.addressShiping,
+        (addr) => addr.address_detail === createBillDto.addressShiping,
       );
       if (indexAddressShiping === -1) {
         throw new BadRequestException("Không tìm thấy địa chỉ giao hàng");
       }
 
-      const total = itemBill.reduce((a, b) => {
-        return Number(a) + Number(b.calcPrice);
+      const total = itemBill.reduce((sum, item) => {
+        return sum + Number(item.calcPrice);
       }, 0);
 
       const newBill: Bill = {
@@ -714,7 +728,15 @@ export class UserService {
 
       return newBillRecord;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      // Log lỗi để debug
+      console.error(`Error occurred:`, error);
+
+      // Kiểm tra và lấy thông báo lỗi chính xác
+      const message =
+        error?.message || error?.response?.message || "Unknown error occurred";
+
+      // Trả về lỗi với thông báo chính xác
+      throw new BadGatewayException(message);
     }
   }
 
@@ -724,7 +746,6 @@ export class UserService {
       if (!user) {
         throw new BadRequestException("Not Found User !");
       }
-      //console.log(`user:`, user);
 
       const indexBill = user.Bill.findIndex(
         (item: any) => item._id.toString() === idBill,
@@ -824,6 +845,21 @@ export class UserService {
         });
       }
 
+      for (const i of itemBill) {
+        const product = await this.productServer.findOne(i.slug);
+
+        const findIndexOption = product.option.findIndex(
+          (item) => item.color === i.color,
+        );
+
+        const newQuantity =
+          +product.option[findIndexOption].amount - Number(i.quantity);
+
+        product.option[findIndexOption].amount = +newQuantity;
+        product.markModified(`option.${findIndexOption}.amount`);
+        await product.save();
+      }
+
       return newBillRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -886,7 +922,7 @@ export class UserService {
   }) {
     try {
       const user = await this.findOne(new mongoose.Types.ObjectId(_id));
-      //console.log(`user:`, user);
+
       if (!user) {
         throw new BadRequestException("Not Found User !");
       }
@@ -931,12 +967,6 @@ export class UserService {
             `Sản Phẩm ${i.name} chỉ còn ${product.option[findIndexOption].amount} sản phẩm`,
           );
         }
-
-        //if (Number(product.amount) < Number(i.quantity)) {
-        //  throw new BadRequestException(
-        //    `Sản Phẩm ${i.name} chỉ còn ${product.amount} sản phẩm`,
-        //  );
-        //}
       }
 
       const total = itemBill.reduce((a, b) => {
@@ -1016,7 +1046,6 @@ export class UserService {
           },
         },
       );
-      //console.log(createShippingGHN.data.data.order_code);
 
       const newBill: Bill = {
         itemArr: itemBill,
@@ -1044,25 +1073,17 @@ export class UserService {
       }
 
       for (const i of itemBill) {
-        console.log(i);
-        //const newQuantity = this.productServer.findOne({ _id: i._id });
         const product = await this.productServer.findOne(i.slug);
 
         const findIndexOption = product.option.findIndex(
           (item) => item.color === i.color,
         );
 
-        //if (+product.option[findIndexOption].amount < Number(i.quantity)) {
-        //  throw new BadRequestException(
-        //    `Sản Phẩm ${i.name} chỉ còn ${product.option[findIndexOption].amount} sản phẩm`,
-        //  );
-        //}
-
-        //console.log(`product:`, product);
         const newQuantity =
           +product.option[findIndexOption].amount - Number(i.quantity);
-        console.log(`newQuantity:`, newQuantity);
-        product.option[findIndexOption].amount = newQuantity;
+
+        product.option[findIndexOption].amount = +newQuantity;
+        product.markModified(`option.${findIndexOption}.amount`);
         await product.save();
       }
 
